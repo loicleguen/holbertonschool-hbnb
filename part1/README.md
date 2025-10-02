@@ -153,5 +153,10 @@ The final document should be clear, professional, and structured in a way that m
 
 
 ## Authors
-loicleguen - [GitHub Profile](https://github.com/loicleguen) \
-Valentin TIQUET - [vtiquet](https://github.com/vtiquet)
+<div align="center">
+  
+| Author | Role | GitHub | Email |
+|--------|------|--------|-------|
+| **Loïc Le Guen** | Co-Developer | [@loicleguen](https://github.com/loicleguen) | 11510@holbertonstudents.com |
+| **Valentin TIQUET** | Co-Developer | [@vtiquet](https://github.com/vtiquet) | 11503@holbertonstudents.com |
+</div>
