@@ -1,6 +1,6 @@
 <div align="center"><img src="https://github.com/ksyv/holbertonschool-web_front_end/blob/main/baniere_holberton.png"></div>
 
-# Titre du Projet (à remplacer)
+# HBnB - UML (Unified Modeling Language)
 
 ## Table of Contents :
 
@@ -34,11 +34,6 @@ PresentationLayer --> BusinessLogicLayer : Facade Pattern
 BusinessLogicLayer --> PersistenceLayer : Database Operations
 ```
 
-* <a href="https://intranet.hbtn.io/concepts/1158" target="_blank" title="[Concept Page] Software Architecture Patterns - Layered Architecture in Python">[Concept Page] Software Architecture Patterns - Layered Architecture in Python</a>
-* <a href="/rltoken/Cbvx3wsffPH9GpvWf3N2SA" target="_blank" title="Facade Pattern Overview">Facade Pattern Overview</a>
-* <a href="/rltoken/cmtzgEn1nV70oHy5yVyXtQ" target="_blank" title="UML Package Diagram Guide">UML Package Diagram Guide</a>
-* <a href="/rltoken/TwbMUc103_TTSmUJ2PJ75g" target="_blank" title="UML Package Diagram Overview">UML Package Diagram Overview</a>
-
 * <p><strong>High-Level Package Diagram:</strong></p>
 
   * A clear, well-organized package diagram showing the three layers (Presentation, Business Logic, Persistence).
@@ -71,11 +66,6 @@ ClassName1 --|> ClassName2 : Inheritance
 ClassName3 *-- ClassName : Composition
 ClassName4 --> ClassName : Association
 ```
-
-* <a href="/rltoken/QeY8b_kDd8LvXn0UrUQf1w" target="_blank" title="UML Class Diagram Tutorial">UML Class Diagram Tutorial</a>
-* <a href="/rltoken/V9C_7aQidACV2TZv6W3aoQ" target="_blank" title="How to Draw UML Class Diagrams">How to Draw UML Class Diagrams</a>
-* <a href="https://intranet.hbtn.io/concepts/1216" target="_blank" title="[Concept Page] OOP - SOLID Pronciples">[Concept Page] OOP - SOLID Pronciples</a>
-* <a href="/rltoken/iosNtHCMbjQLGQyu59HD0A" target="_blank" title="SOLID Principles of Object-Oriented Design">SOLID Principles of Object-Oriented Design</a>
 
 * <p><strong>Detailed Class Diagram:</strong></p>
 
@@ -116,10 +106,6 @@ BusinessLogic-->>API: Return Response
 API-->>User: Return Success/Failure
 ```
 
-* <a href="/rltoken/JLXWY9rghHDqvehB0bmw8g" target="_blank" title="UML Sequence Diagram Tutorial">UML Sequence Diagram Tutorial</a>
-* <a href="/rltoken/fGZTiA0jmClwNuP9RIYDcA" target="_blank" title="Understanding Sequence Diagrams">Understanding Sequence Diagrams</a>
-* <a href="/rltoken/wTzEdyHuxhh74FPpDhH-Vw" target="_blank" title="RESTful API Design Guide">RESTful API Design Guide</a>
-
 * <p><strong>Sequence Diagrams:</strong></p>
 
   * Four sequence diagrams, each depicting the interaction flow for a specific API call (User Registration, Place Creation, Review Submission, Fetching a List of Places).
@@ -144,10 +130,6 @@ In this task, you will bring together the high-level package diagram, detailed c
 
 The final document should be clear, professional, and structured in a way that makes it easy to follow and understand. It will be used as a reference throughout the project, so accuracy and completeness are critical.
 
-* <a href="/rltoken/9sAyWkM3-MQGta2kyH-k5Q" target="_blank" title="Microsoft Writing Style Guide">Microsoft Writing Style Guide</a>
-* <a href="/rltoken/LjS7MOmyU-K0WRA3O5eJdA" target="_blank" title="Google Developer Documentation Style Guide">Google Developer Documentation Style Guide</a>
-* <a href="/rltoken/BCmDSCGkenCERKmyZJE4dw" target="_blank" title="Formatting Documents">Formatting Documents</a>
-
 <strong>Comprehensive Technical Document:</strong>
 - A well-organized document that includes:
   - <strong>Introduction:</strong> Overview of the project and the purpose of the document.
@@ -163,6 +145,13 @@ The final document should be clear, professional, and structured in a way that m
 
 ---
 
+## 📦 Project Structure
+- [0. High-Level Package Diagram.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/0.%20High-Level%20Package%20Diagram.md): a 3-layer architecture (UML Package Diagram) showing layers and the Facade Pattern.
+- [1. Detailed Class Diagram for Business Logic Layer.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/1.%20Detailed%20Class%20Diagram%20for%20Business%20Logic%20Layer.md): a detailed UML Class Diagram for the Business Logic layer entities (User, Place, Review, Amenity)
+- [2. Sequence Diagrams for API Calls.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/2.%20Sequence%20Diagrams%20for%20API%20Calls.md): four UML Sequence Diagrams to map the flow of information for key API calls across the three layers
+- [3. Documentation Compilation.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/3.%20Documentation%20Compilation.md): a compilation of all diagrams and notes into a single, comprehensive Technical Document.
+
 
 ## Authors
-loicleguen - [GitHub Profile](https://github.com/loicleguen)
+loicleguen - [GitHub Profile](https://github.com/loicleguen) \
+Valentin TIQUET - [vtiquet](https://github.com/vtiquet)
