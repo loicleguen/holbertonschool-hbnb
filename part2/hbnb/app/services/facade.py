@@ -3,6 +3,8 @@ from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
+import uuid
+from datetime import datetime
 
 class HBnBFacade:
     def __init__(self):
@@ -13,17 +15,31 @@ class HBnBFacade:
 
     # Placeholder method for creating a user
     def create_user(self, user_data):
-        # Logic will be implemented in later tasks
-        user = User(**user_data)
+        # 1. Validation de l'email (maintenue)
+        email = user_data.get('email')
+        if not email:
+            raise ValueError("Email is required")
+            
+        existing_user = self.get_user_by_email(email)
+        if existing_user:
+            raise ValueError("Email already registered")
+            
+        # **2. CRÉATION DES CHAMPS MANQUANTS :**
+        now = datetime.now()
+        
+        # Créez une copie du dictionnaire des données et ajoutez les champs requis
+        full_user_data = user_data.copy()
+        full_user_data.update({
+            'id': str(uuid.uuid4()),      # Génère un ID unique
+            'is_admin': False,            # Définit la valeur par défaut
+            'created_at': now,            # Définit l'heure actuelle
+            'updated_at': now,            # Définit l'heure actuelle
+        })
+
+        user = User(**full_user_data)
+        
         return self.user_repo.add(user)
-    
-    def get_user(self, user_id):
-        return self.user_repo.get(user_id)
-    
-    def get_all_users(self):
-        """Retrieves a list of all User entities."""
-        return self.user_repository.get_all()
-    
+
     def update_user(self, user_id, data):
         """Updates an existing User's attributes."""
         if not isinstance(user_id, str):
