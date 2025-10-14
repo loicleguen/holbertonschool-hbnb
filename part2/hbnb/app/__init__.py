@@ -13,3 +13,8 @@ def create_app():
     api.add_namespace(users_ns, path='/api/v1/users')
 
     return app
+
+if __name__ == '__main__':
+    # Ensure this runs the application correctly
+    app = create_app()
+    app.run(debug=True)

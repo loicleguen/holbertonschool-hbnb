@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask import request
 
 api = Namespace('users', description='User operations')
 
@@ -27,6 +28,17 @@ class UserList(Resource):
 
         new_user = facade.create_user(user_data)
         return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
+    
+    def get(self):
+        """List all Users"""
+        users = facade.get_all_user()
+        return [{
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
+        } for user in users], 200
+
 
 
 @api.route('/<user_id>')
@@ -39,3 +51,22 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
+    
+    def put(self, user_id):
+        """
+        Update an existing user by ID.
+
+        Args:
+            user_id (str): Unique identifier of the user.
+
+        Returns:
+            tuple: Updated user data dictionary and HTTP 200 on success,
+                   or error message and HTTP 404 if not found.
+        """
+        user = facade.get_user(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
+
+        # Update user data and return the updated user
+        updated_user = facade.update_user(user_id, api.payload)
+        return updated_user.to_dict(), 200
