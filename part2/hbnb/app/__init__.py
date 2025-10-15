@@ -4,6 +4,7 @@
 from flask import Flask
 from flask_restx import Api
 from app.api.v1.users import usersns
+from app.api.v1.amenities import amenitiesns
 
 
 def create_app():
@@ -16,5 +17,6 @@ def create_app():
 
     # Register namespaces
     api.add_namespace(usersns, path='/api/v1/users')
+    api.add_namespace(amenitiesns, path='/api/v1/amenities')
 
     return app
