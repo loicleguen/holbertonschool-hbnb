@@ -1,63 +1,71 @@
+#!/usr/bin/python3
+"""Facade layer: unified access to business logic"""
+
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
-from app.models.place import Place
-from app.models.review import Review
-from app.models.amenity import Amenity
-import uuid
 from datetime import datetime
+import uuid
 
 class HBnBFacade:
+    """Facade for Users (part 2)"""
+
     def __init__(self):
         self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
 
-    # Placeholder method for creating a user
     def create_user(self, user_data):
-        # 1. Validation de l'email (maintenue)
+        """Create a new user with validation and defaults"""
         email = user_data.get('email')
         if not email:
             raise ValueError("Email is required")
-            
+
+        # Check if email already exists
         existing_user = self.get_user_by_email(email)
         if existing_user:
             raise ValueError("Email already registered")
-            
-        # **2. CRÉATION DES CHAMPS MANQUANTS :**
+
+        # Add default fields
         now = datetime.now()
-        
-        # Créez une copie du dictionnaire des données et ajoutez les champs requis
         full_user_data = user_data.copy()
         full_user_data.update({
-            'id': str(uuid.uuid4()),      # Génère un ID unique
-            'is_admin': False,            # Définit la valeur par défaut
-            'created_at': now,            # Définit l'heure actuelle
-            'updated_at': now,            # Définit l'heure actuelle
+            'id': str(uuid.uuid4()),
+            'created_at': now,
+            'updated_at': now,
         })
 
         user = User(**full_user_data)
-        
-        return self.user_repo.add(user)
+        # Validate user
+        if hasattr(user, "validate"):
+            user.validate
+        # Add to repository
+        self.user_repo.add(user)
+        return user
 
-    def update_user(self, user_id, data):
-        """Updates an existing User's attributes."""
+    def get_user(self, user_id):
+        """Retrieve user by ID"""
         if not isinstance(user_id, str):
             raise TypeError("User ID must be a string")
-        
-        # Simple check to prevent updating core identity fields via PUT
+        return self.user_repo.get(user_id)
+
+    def get_user_by_email(self, email):
+        """Retrieve user by email"""
+        return self.user_repo.get_by_attribute('email', email)
+
+    def get_all_user(self):
+        """Retrieve all users"""
+        return self.user_repo.get_all()
+
+    def update_user(self, user_id, data):
+        """Update an existing user's attributes"""
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+
+        # Prevent updating protected fields
         for field in ['id', 'email', 'created_at', 'updated_at']:
             if field in data:
                 raise ValueError(f"Cannot update '{field}' via this endpoint")
-        
-        # Delegate to the repository's update method
-        return self.user_repository.update(user_id, **data)
 
-    def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
-
-
-    # Placeholder method for fetching a place by ID
-    def get_place(self, place_id):
-        # Logic will be implemented in later tasks
-        pass
+        # Apply update and validate
+        user.update(data)
+        self.user_repo.update(user_id, data)
+        return user
