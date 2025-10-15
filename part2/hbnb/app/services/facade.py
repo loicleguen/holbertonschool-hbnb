@@ -13,9 +13,7 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-    # Placeholder method for creating a user
     def create_user(self, user_data):
-        # 1. Validation de l'email (maintenue)
         email = user_data.get('email')
         if not email:
             raise ValueError("Email is required")
@@ -23,11 +21,9 @@ class HBnBFacade:
         existing_user = self.get_user_by_email(email)
         if existing_user:
             raise ValueError("Email already registered")
-            
-        # **2. CRÉATION DES CHAMPS MANQUANTS :**
+
         now = datetime.now()
-        
-        # Créez une copie du dictionnaire des données et ajoutez les champs requis
+
         full_user_data = user_data.copy()
         full_user_data.update({
             'id': str(uuid.uuid4()),      # Génère un ID unique
@@ -44,20 +40,46 @@ class HBnBFacade:
         """Updates an existing User's attributes."""
         if not isinstance(user_id, str):
             raise TypeError("User ID must be a string")
-        
-        # Simple check to prevent updating core identity fields via PUT
+
         for field in ['id', 'email', 'created_at', 'updated_at']:
             if field in data:
                 raise ValueError(f"Cannot update '{field}' via this endpoint")
-        
-        # Delegate to the repository's update method
-        return self.user_repository.update(user_id, **data)
+
+        return self.user_repo.update(user_id, **data)
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
 
+    def get_all_users(self):
+        """Retrieves a list of all User entities."""
+        return self.user_repo.get_all()
 
-    # Placeholder method for fetching a place by ID
+    def create_amenity(self, amenity_data):
+        """Creates and stores a new Amenity entity."""
+        amenity = Amenity(**amenity_data)
+        return self.amenity_repo.add(amenity)
+
+    def get_amenity(self, amenity_id):
+        """Retrieves an Amenity by ID."""
+        if not isinstance(amenity_id, str):
+            raise TypeError("Amenity ID must be a string")
+        return self.amenity_repo.get(amenity_id)
+
+    def get_all_amenities(self):
+        """Retrieves a list of all Amenity entities."""
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        """Updates an existing Amenity's attributes."""
+        if not isinstance(amenity_id, str):
+            raise TypeError("Amenity ID must be a string")
+
+        for field in ['id', 'created_at', 'updated_at']:
+            if field in amenity_data:
+                raise ValueError(f"Cannot update '{field}' via this endpoint")
+
+        return self.amenity_repo.update(amenity_id, **amenity_data)
+
     def get_place(self, place_id):
         # Logic will be implemented in later tasks
         pass
