@@ -11,13 +11,16 @@ class HBnBFacade:
         self.amenity_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
 
+
     # --- Users ---
+
     def create_user(self, user_data):
         email = user_data.get('email')
         if not email:
             raise ValueError("Email is required")
         if self.get_user_by_email(email):
             raise ValueError("Email already registered")
+
 
         user = User()
         for k, v in user_data.items():
@@ -46,6 +49,7 @@ class HBnBFacade:
         user.update(data)
         return user
 
+
     # --- Amenities ---
     def create_amenity(self, amenity_data):
         name = amenity_data.get("name")
@@ -56,6 +60,7 @@ class HBnBFacade:
         amenity.validate()
         self.amenity_repo.add(amenity)
         return amenity
+
 
     def get_amenity(self, amenity_id):
         return self.amenity_repo.get(amenity_id)
@@ -117,3 +122,4 @@ class HBnBFacade:
                 setattr(place, key, value)
         place.validate()
         return place
+

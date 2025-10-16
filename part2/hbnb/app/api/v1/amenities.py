@@ -51,3 +51,4 @@ class AmenityResource(Resource):
         if not updated:
             amenitiesns.abort(404, 'Amenity not found')
         return updated.to_dict(), 200
+

@@ -4,11 +4,13 @@ from flask import request
 from app.services.facade import HBnBFacade
 
 
+
 # Namespace
 usersns = Namespace('users', description='User operations')
 
 # User model pour validation et documentation
 user_model = usersns.model('User', {
+
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
@@ -20,6 +22,7 @@ user_update_model = usersns.model('UserUpdate', {
     'first_name': fields.String(required=False, description='First name of the user'),
     'last_name': fields.String(required=False, description='Last name of the user')
 })
+
 
 
 # ---------------------------
@@ -34,6 +37,7 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = request.get_json() or {}
+
 
         try:
             new_user = usersns.facade.create_user(user_data)
@@ -62,6 +66,7 @@ class UserList(Resource):
             } for u in users
         ], 200
 
+
 # ---------------------------
 # Détails et mise à jour d'un utilisateur
 # ---------------------------
@@ -70,6 +75,7 @@ class UserResource(Resource):
 
     @usersns.response(200, 'User details retrieved successfully')
     @usersns.response(404, 'User not found')
+
     def get(self, user_id):
         """Get user details by ID"""
         user = usersns.facade.get_user(user_id)
@@ -86,6 +92,7 @@ class UserResource(Resource):
     @usersns.response(200, 'User successfully updated')
     @usersns.response(400, 'Invalid input data')
     @usersns.response(404, 'User not found')
+
     def put(self, user_id):
         """Update an existing user by ID"""
         data = request.get_json() or {}
