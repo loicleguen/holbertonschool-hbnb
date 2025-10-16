@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
+from app import facade as facade_instance
 
 
 amenities_ns = Namespace('amenities', description='Amenity operations')
@@ -21,15 +22,22 @@ class AmenityList(Resource):
     @amenities_ns.expect(amenity_model, validate=True)
     @amenities_ns.response(201, 'Amenity successfully created', amenity_response_model)
     def post(self):
+        """Create a new Amenity"""
         data = request.get_json()
-        amenity = amenities_ns.facade.create_amenity(data)
-        return amenity.to_dict(), 201
+        try:
+            amenity = facade_instance.create_amenity(data)
+            return amenity.to_dict(), 201
+        except (ValueError, TypeError) as e:
+            amenitiesns.abort(400, message=str(e))
+        except Exception:
+            amenitiesns.abort(500, message='Internal server error')
 
     @amenities_ns.marshal_list_with(amenity_response_model)
     @amenities_ns.response(200, 'List of amenities retrieved successfully')
     def get(self):
-        amenities = amenities_ns.facade.get_all_amenities()
-        return [a.to_dict() for a in amenities], 200
+        """List all Amenities"""
+        amenities = facade_instance.get_all_amenities()
+        return [a.to_dict() for a in amenities]
 
 @amenities_ns.route('/<string:amenity_id>')
 class AmenityResource(Resource):
@@ -37,16 +45,37 @@ class AmenityResource(Resource):
     @amenities_ns.response(200, 'Amenity details retrieved successfully')
     @amenities_ns.response(404, 'Amenity not found')
     def get(self, amenity_id):
-        amenity = amenities_ns.facade.get_amenity(amenity_id)
+        """Get details for a specific Amenity"""
+        amenity = facade_instance.get_amenity(amenity_id)
         if not amenity:
-            amenities_ns.abort(404, 'Amenity not found')
-        return amenity.to_dict(), 200
+            amenitiesns.abort(404, 'Amenity not found')
+        return amenity.to_dict()
 
-    @amenities_ns.expect(amenity_model, validate=True)
-    @amenities_ns.response(200, 'Amenity updated successfully')
-    @amenities_ns.response(404, 'Amenity not found')
+    @amenitiesns.expect(amenity_model, validate=True)
+    @amenitiesns.marshal_with(amenity_response_model)
+    @amenitiesns.response(200, 'Amenity updated successfully')
+    @amenitiesns.response(404, 'Amenity not found')
     def put(self, amenity_id):
+        """Update a specific Amenity"""
         data = request.get_json()
+        
+        try:
+            updated = facade_instance.update_amenity(amenity_id, data)
+        except (ValueError, TypeError) as e:
+            amenitiesns.abort(400, message=str(e))
+            
+        if not updated:
+            amenitiesns.abort(404, 'Amenity not found')
+        return updated.to_dict()
+
+    @amenitiesns.response(204, 'Amenity successfully deleted')
+    @amenitiesns.response(404, 'Amenity not found')
+    def delete(self, amenity_id):
+        """Delete a specific Amenity"""
+        deleted = facade_instance.delete_amenity(amenity_id)
+        if not deleted:
+            amenitiesns.abort(404, 'Amenity not found')
+        return {"message": "Amenity is deleted"}, 200
         updated = amenities_ns.facade.update_amenity(amenity_id, data)
         if not updated:
             amenities_ns.abort(404, 'Amenity not found')

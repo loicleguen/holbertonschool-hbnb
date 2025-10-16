@@ -21,17 +21,17 @@ def create_app():
               description='HBnB Application API',
               doc='/api/v1/')
     
-    users_ns.facade = facade
-    amenities_ns.facade = facade
-    places_ns.facade = facade
-    reviews_ns.facade = facade
+    from app.api.v1.users import usersns
+    from app.api.v1.amenities import amenitiesns
+    from app.api.v1.places import placesns
+    from app.api.v1.reviews import reviewsns
 
 
     # Register namespaces
-    api.add_namespace(users_ns, path='/api/v1/users')
-    api.add_namespace(amenities_ns, path='/api/v1/amenities')
-    api.add_namespace(places_ns, path='/api/v1/places')
-    api.add_namespace(reviews_ns, path='/api/v1/reviews')
+    api.add_namespace(usersns, path='/api/v1/users')
+    api.add_namespace(amenitiesns, path='/api/v1/amenities')
+    api.add_namespace(placesns, path='/api/v1/places')
+    api.add_namespace(reviewsns, path='/api/v1/reviews')
 
 
     return app

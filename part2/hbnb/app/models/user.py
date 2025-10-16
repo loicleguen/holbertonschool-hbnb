@@ -1,14 +1,23 @@
-from app.models.BaseModel import BaseModel
+from .BaseModel import BaseModel
 from email_validator import validate_email, EmailNotValidError
-import bcrypt
+# bcrypt import removed
 
 class User(BaseModel):
+    # Defining class attributes here ensures they exist on the instance
     email = ""
-    password = ""
+    # password removed
     first_name = ""
     last_name = ""
+    
+    def __init__(self, *args, **kwargs):
+        """
+        Initializes User object, leveraging BaseModel for ID/timestamps,
+        and setting attributes from kwargs if provided (e.g., deserialization).
+        """
+        super().__init__(*args, **kwargs)
 
     def validate(self):
+        # Validation checks
         if not isinstance(self.first_name, str) or not self.first_name.strip():
             raise ValueError("first_name must be a non-empty string")
         if len(self.first_name) > 50:
@@ -25,20 +34,23 @@ class User(BaseModel):
         except EmailNotValidError as e:
             raise ValueError(str(e))
 
-        if not isinstance(self.password, str):
-            raise TypeError("password must be a string")
-        if len(self.password) < 6:
-            raise ValueError("password must be at least 6 characters long")
+        # Password validation removed
 
     def save(self):
         self.validate()
-        if self.password and not self.password.startswith("$2b$"):
-            self.password = bcrypt.hash(self.password)
+        
+        # Password hashing logic removed
+        
+        # Mise à jour de updated_at
         super().save()
+        
+    # check_password method removed
 
     def update(self, data):
+        # Update attributes directly
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+        
         self.validate()
         super().save()
