@@ -1,6 +1,5 @@
 from app.persistence.repository import InMemoryRepository
 from datetime import datetime
-import uuid
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
@@ -57,7 +56,6 @@ class HBnBFacade:
         user.update(data) # user.update() calls user.save() internally
         return user
 
-<<<<<<< HEAD
     def delete_user(self, user_id):
         """Delete a user and their associated places (cascade-like logic)"""
         user = self.user_repo.get(user_id)
@@ -74,8 +72,6 @@ class HBnBFacade:
 
         self.user_repo.delete(user_id)
         return True
-=======
->>>>>>> d93215b66c691f44bbaebe3e4250ba9e64830dd7
 
     # --- Amenities ---
     def create_amenity(self, amenity_data):
@@ -196,7 +192,6 @@ class HBnBFacade:
         place.update(update_data) 
         return place
 
-<<<<<<< HEAD
     def delete_place(self, place_id):
         """Delete a place."""
         place = self.place_repo.get(place_id)
@@ -267,5 +262,3 @@ class HBnBFacade:
     def delete_review(self, review_id):
         """Deletes a Review by ID."""
         return self.review_repo.delete(review_id)
-=======
->>>>>>> d93215b66c691f44bbaebe3e4250ba9e64830dd7

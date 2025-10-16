@@ -5,16 +5,10 @@ from app import facade as facade_instance
 
 
 # Namespace
-usersns = Namespace('users', description='User operations')
+users_ns = Namespace('users', description='User operations')
 
-<<<<<<< HEAD
 # User model for validation and documentation (Input)
 user_model = usersns.model('UserInput', {
-=======
-# User model pour validation et documentation
-user_model = usersns.model('User', {
-
->>>>>>> d93215b66c691f44bbaebe3e4250ba9e64830dd7
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
@@ -40,7 +34,7 @@ user_update_model = usersns.model('UserUpdateInput', {
 # ---------------------------
 # User list and creation
 # ---------------------------
-@usersns.route('/')
+@users_ns.route('/')
 class UserList(Resource):
 
     @usersns.expect(user_model, validate=True)
@@ -78,7 +72,7 @@ class UserList(Resource):
 # ---------------------------
 # User details and update/delete
 # ---------------------------
-@usersns.route('/<string:user_id>')
+@users_ns.route('/<string:user_id>')
 class UserResource(Resource):
 
     @usersns.marshal_with(user_response_model)

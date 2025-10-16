@@ -5,12 +5,10 @@ from app.services.facade import HBnBFacade
 from flask import Flask
 from flask_restx import Api
 
-<<<<<<< HEAD
-=======
-from app.api.v1.users import usersns
-from app.api.v1.amenities import amenitiesns
-from app.api.v1.places import placesns
->>>>>>> d93215b66c691f44bbaebe3e4250ba9e64830dd7
+from app.api.v1.users import users_ns
+from app.api.v1.amenities import amenities_ns
+from app.api.v1.places import places_ns
+from app.api.v1.reviews import reviews_ns
 
 facade = HBnBFacade()
 
