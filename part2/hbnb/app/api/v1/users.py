@@ -6,10 +6,10 @@ from app.services.facade import HBnBFacade
 
 
 # Namespace
-usersns = Namespace('users', description='User operations')
+users_ns = Namespace('users', description='User operations')
 
 # User model pour validation et documentation
-user_model = usersns.model('User', {
+user_model = users_ns.model('User', {
 
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
@@ -18,7 +18,7 @@ user_model = usersns.model('User', {
 })
 
 # Modèle pour la mise à jour d'un utilisateur (PUT)
-user_update_model = usersns.model('UserUpdate', {
+user_update_model = users_ns.model('UserUpdate', {
     'first_name': fields.String(required=False, description='First name of the user'),
     'last_name': fields.String(required=False, description='Last name of the user')
 })
@@ -28,19 +28,19 @@ user_update_model = usersns.model('UserUpdate', {
 # ---------------------------
 # Liste des utilisateurs et création
 # ---------------------------
-@usersns.route('/')
+@users_ns.route('/')
 class UserList(Resource):
 
-    @usersns.expect(user_model, validate=True)
-    @usersns.response(201, 'User successfully created')
-    @usersns.response(400, 'Email already registered or invalid input')
+    @users_ns.expect(user_model, validate=True)
+    @users_ns.response(201, 'User successfully created')
+    @users_ns.response(400, 'Email already registered or invalid input')
     def post(self):
         """Register a new user"""
         user_data = request.get_json() or {}
 
 
         try:
-            new_user = usersns.facade.create_user(user_data)
+            new_user = users_ns.facade.create_user(user_data)
         except (ValueError, TypeError) as e:
             return {'error': str(e)}, 400
         except Exception:
@@ -53,10 +53,10 @@ class UserList(Resource):
             'email': new_user.email
         }, 201
 
-    @usersns.response(200, 'List of users retrieved successfully')
+    @users_ns.response(200, 'List of users retrieved successfully')
     def get(self):
         """List all users"""
-        users = usersns.facade.get_all_user()
+        users = users_ns.facade.get_all_user()
         return [
             {
                 'id': u.id,
@@ -70,15 +70,15 @@ class UserList(Resource):
 # ---------------------------
 # Détails et mise à jour d'un utilisateur
 # ---------------------------
-@usersns.route('/<string:user_id>')
+@users_ns.route('/<string:user_id>')
 class UserResource(Resource):
 
-    @usersns.response(200, 'User details retrieved successfully')
-    @usersns.response(404, 'User not found')
+    @users_ns.response(200, 'User details retrieved successfully')
+    @users_ns.response(404, 'User not found')
 
     def get(self, user_id):
         """Get user details by ID"""
-        user = usersns.facade.get_user(user_id)
+        user = users_ns.facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
         return {
@@ -88,17 +88,17 @@ class UserResource(Resource):
             'email': user.email
         }, 200
 
-    @usersns.expect(user_update_model, validate=True)
-    @usersns.response(200, 'User successfully updated')
-    @usersns.response(400, 'Invalid input data')
-    @usersns.response(404, 'User not found')
+    @users_ns.expect(user_update_model, validate=True)
+    @users_ns.response(200, 'User successfully updated')
+    @users_ns.response(400, 'Invalid input data')
+    @users_ns.response(404, 'User not found')
 
     def put(self, user_id):
         """Update an existing user by ID"""
         data = request.get_json() or {}
 
         try:
-            updated_user = usersns.facade.update_user(user_id, data)
+            updated_user = users_ns.facade.update_user(user_id, data)
         except ValueError as e:
             return {'error': str(e)}, 400
 

@@ -4,13 +4,14 @@ import uuid
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
+from app.models.review import Review
 
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
-
+        self.review_repo = InMemoryRepository()
 
     # --- Users ---
 
@@ -123,3 +124,66 @@ class HBnBFacade:
         place.validate()
         return place
 
+    # --- Review ---
+    
+    def create_review(self, review_data):
+        """
+        Creates and stores a new Review entity.
+        Validates foreign keys (user_id, place_id).
+        """
+        user_id = review_data.get('user_id')
+        place_id = review_data.get('place_id')
+
+        if not user_id or not self.user_repo.get(user_id):
+            raise ValueError("Invalid or missing user_id.")
+        if not place_id or not self.place_repo.get(place_id):
+            raise ValueError("Invalid or missing place_id.")
+
+        review = Review()
+        for k, v in review_data.items():
+            setattr(review, k, v)
+
+        review.validate()
+
+        self.review_repo.add(review)
+        return review
+
+    def get_review(self, review_id):
+        """Retrieves a Review by ID."""
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        """Retrieves a list of all Review entities."""
+        return self.review_repo.get_all()
+
+    def get_reviews_by_place(self, place_id):
+        """Retrieves all reviews associated with a specific Place ID."""
+        if not self.place_repo.get(place_id):
+             return None 
+
+        return self.review_repo.get_by_attribute('place_id', place_id)
+
+    def update_review(self, review_id, review_data):
+        """
+        Updates an existing Review's attributes.
+        Only 'text' and 'rating' should be updateable.
+        """
+        review = self.review_repo.get(review_id)
+        if not review:
+            return None
+
+        for field in ['id', 'user_id', 'place_id', 'created_at', 'updated_at']:
+            if field in review_data:
+                raise ValueError(f"Cannot update '{field}'")
+
+        for key, value in review_data.items():
+            setattr(review, key, value)
+
+        review.validate()
+        review.updated_at = datetime.now()
+
+        return review
+
+    def delete_review(self, review_id):
+        """Deletes a Review by ID."""
+        return self.review_repo.delete(review_id)
