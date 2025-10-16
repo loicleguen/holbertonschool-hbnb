@@ -5,22 +5,36 @@ import uuid
 from datetime import datetime
 
 class BaseModel:
-    """Base class for all models"""
+    """Base class for all models, handling ID and timestamps"""
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes a new object or deserializes from kwargs.
+        Kwargs are typically from the to_dict() method.
+        """
         if kwargs:
             for key, value in kwargs.items():
                 if key == "__class__":
                     continue
+                # Deserialization: Convert string timestamps back to datetime objects
                 if key in ('created_at', 'updated_at') and isinstance(value, str):
-                    value = datetime.fromisoformat(value)
+                    try:
+                        value = datetime.fromisoformat(value)
+                    except ValueError:
+                        # Handle case where datetime string format is invalid
+                        print(f"Warning: Could not deserialize datetime for key {key} with value {value}")
+                        continue
+                
+                # Set attribute on the instance
                 setattr(self, key, value)
         else:
+            # New instance creation
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
 
     def __str__(self):
+        """Returns the string representation of the object"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):

@@ -1,20 +1,23 @@
-from .BaseModel import BaseModel, datetime
+from .BaseModel import BaseModel
 
 class Amenity(BaseModel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.name = kwargs.get("name", "")
+    def __init__(self, name=None, *args, **kwargs):
+        # BaseModel handles id, created_at, updated_at, and deserializes kwargs
+        super().__init__(*args, **kwargs) 
+        
+        if name is not None:
+            self.name = name
+        elif not hasattr(self, 'name'):
+            self.name = kwargs.get("name", "")
 
     def validate(self):
-        if not isinstance(self.id, str):
-            raise TypeError("id must be a string")
-        if len(self.id) < 1:
-            raise ValueError("id mustn't be empty")
+        """Validates the Amenity object properties"""
+        if not hasattr(self, 'name'):
+            raise TypeError("name attribute is missing")
+            
         if not isinstance(self.name, str):
-            raise TypeError("name must be a string")
+            raise TypeError("Name must be a string")
         if len(self.name) < 1 or len(self.name) > 50:
-            raise ValueError("name must be between 1 and 50 characters")
-        if not isinstance(self.created_at, datetime):
-            raise TypeError("created_at must be a datetime")
-        if not isinstance(self.updated_at, datetime):
-            raise TypeError("updated_at must be a datetime")
+            raise ValueError("Name must be between 1 and 50 characters")
+        
+        return True
