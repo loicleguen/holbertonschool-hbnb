@@ -1,6 +1,6 @@
 from app.models.BaseModel import BaseModel
 from email_validator import validate_email, EmailNotValidError
-from passlib.hash import bcrypt
+import bcrypt
 
 class User(BaseModel):
     email = ""

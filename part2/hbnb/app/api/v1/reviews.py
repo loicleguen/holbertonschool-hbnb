@@ -100,5 +100,5 @@ class PlaceReviewList(Resource):
 
         if reviews is None:
             reviews_ns.abort(404, 'Place not found')
-            
+
         return [r.to_dict() for r in reviews], 200
