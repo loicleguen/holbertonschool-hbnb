@@ -138,7 +138,7 @@ class HBnBFacade:
         if not place_id or not self.place_repo.get(place_id):
             raise ValueError("Invalid or missing place_id.")
 
-        review = Review()
+        review = Review(**review_data)
         for k, v in review_data.items():
             setattr(review, k, v)
 

@@ -4,10 +4,10 @@ from .BaseModel import BaseModel, datetime
 class Review(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.text = kwargs.get('text')
-        self.rating = kwargs.get('rating')
-        self.place_id = kwargs.get('place_id')
-        self.user_id = kwargs.get('user_id')
+        self.text = kwargs.get('text', '')
+        self.rating = kwargs.get('rating', 0)
+        self.place_id = kwargs.get('place_id', '')
+        self.user_id = kwargs.get('user_id', '')
 
 
     def validate(self):
