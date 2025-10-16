@@ -65,6 +65,7 @@ class AmenityResource(Resource):
             
         if not updated:
             amenitiesns.abort(404, 'Amenity not found')
+<<<<<<< HEAD
         return updated.to_dict()
 
     @amenitiesns.response(204, 'Amenity successfully deleted')
@@ -75,3 +76,7 @@ class AmenityResource(Resource):
         if not deleted:
             amenitiesns.abort(404, 'Amenity not found')
         return {"message": "Amenity is deleted"}, 200
+=======
+        return updated.to_dict(), 200
+
+>>>>>>> d93215b66c691f44bbaebe3e4250ba9e64830dd7

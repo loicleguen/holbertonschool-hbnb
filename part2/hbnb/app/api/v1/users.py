@@ -3,11 +3,18 @@ from flask import request
 from app import facade as facade_instance
 
 
+
 # Namespace
 usersns = Namespace('users', description='User operations')
 
+<<<<<<< HEAD
 # User model for validation and documentation (Input)
 user_model = usersns.model('UserInput', {
+=======
+# User model pour validation et documentation
+user_model = usersns.model('User', {
+
+>>>>>>> d93215b66c691f44bbaebe3e4250ba9e64830dd7
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
@@ -29,6 +36,7 @@ user_update_model = usersns.model('UserUpdateInput', {
 })
 
 
+
 # ---------------------------
 # User list and creation
 # ---------------------------
@@ -42,6 +50,7 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = request.get_json() or {}
+
 
         try:
             # Uses the global user_facade instance
@@ -65,6 +74,7 @@ class UserList(Resource):
         
         return [u.to_dict() for u in users]
 
+
 # ---------------------------
 # User details and update/delete
 # ---------------------------
@@ -74,6 +84,7 @@ class UserResource(Resource):
     @usersns.marshal_with(user_response_model)
     @usersns.response(200, 'User details retrieved successfully')
     @usersns.response(404, 'User not found')
+
     def get(self, user_id):
         """Get user details by ID"""
         # Uses the global user_facade instance
@@ -87,6 +98,7 @@ class UserResource(Resource):
     @usersns.response(200, 'User successfully updated')
     @usersns.response(400, 'Invalid input data')
     @usersns.response(404, 'User not found')
+
     def put(self, user_id):
         """Update an existing user by ID"""
         data = request.get_json() or {}
