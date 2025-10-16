@@ -41,13 +41,18 @@ class BaseModel:
         """Update updated_at timestamp"""
         self.updated_at = datetime.now()
 
-    def to_dict(self):
-        """Return a dict representation"""
-        result = self.__dict__.copy()
-        result["__class__"] = self.__class__.__name__
-        result["created_at"] = self.created_at.isoformat()
-        result["updated_at"] = self.updated_at.isoformat()
-        return result
+    def to_dict(self, **kwargs):
+        """Returns a dictionary representation of the instance, absorbing any extra arguments."""
+        data = self.__dict__.copy()
+
+        if 'created_at' in data:
+            data['created_at'] = data['created_at'].isoformat()
+        if 'updated_at' in data:
+            data['updated_at'] = data['updated_at'].isoformat()
+            
+        data['__class__'] = self.__class__.__name__
+        
+        return data
 
     def update(self, data):
         """Update attributes from dict, protect immutable fields"""

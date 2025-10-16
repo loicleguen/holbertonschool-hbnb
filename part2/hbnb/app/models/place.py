@@ -1,17 +1,13 @@
-from .BaseModel import BaseModel, datetime
+from .BaseModel import BaseModel
 
 
 class Place(BaseModel):
-    # This __init__ is now robust for both creation (positional or kwargs) and loading (kwargs)
     def __init__(self, title=None, description=None, price=None,
                  latitude=None, longitude=None, owner_id=None,
                  amenities=None, *args, **kwargs):
-        
-        # Pass all args to BaseModel to handle ID/timestamps/deserialization
+
         super().__init__(*args, **kwargs)
-        
-        # If loading from kwargs, BaseModel already sets attributes via setattr.
-        # We ensure attributes are set for new objects (positional args) or fallback to kwargs values.
+
         self.title = self.__dict__.get('title', title)
         self.description = self.__dict__.get('description', description)
         self.price = self.__dict__.get('price', price)
@@ -53,49 +49,33 @@ class Place(BaseModel):
         return True
 
     def add_amenity(self, amenity_id):
-        # This function might need adjustment depending on whether it stores IDs or objects
         if amenity_id not in self.amenities:
             self.amenities.append(amenity_id)
 
-    def to_dict(self, owners_map=None, amenities_map=None):
+    def to_dict(self, owners_map=None, amenities_map=None, reviews_map=None, **kwargs):
         """
-        Serialize Place object to a dict for API responses.
-        owners_map: dict {owner_id: owner_obj}
-        amenities_map: dict {amenity_id: amenity_obj}
+        Returns a dictionary representation of the Place, including nested objects,
+        and absorbing any extra arguments like 'safe'.
         """
-        owner_obj = None
-        if owners_map and self.owner_id in owners_map:
-            owner_obj = owners_map[self.owner_id]
+        place_dict = super().to_dict(**kwargs) 
 
-        # Amenities List preparation
-        amenities_list = []
-        if self.amenities:
-            # If the amenities list already contains full objects (as set by Facade.create_place), use them.
-            if self.amenities and hasattr(self.amenities[0], 'name'):
-                 amenities_list = self.amenities
-            elif amenities_map:
-                # If only IDs are stored, use the map
-                amenities_list = [amenities_map[aid] for aid in self.amenities if aid in amenities_map and hasattr(amenities_map[aid], 'id')]
-            else:
-                # Fallback, this will likely cause marshalling errors if full objects are expected
-                pass 
+        owner_id = place_dict.pop('owner_id', None)
+        if owner_id and owners_map and owner_id in owners_map:
+            owner_obj = owners_map[owner_id]
+            place_dict['owner'] = owner_obj.to_dict(safe=True) 
+        else:
+            place_dict['owner'] = {'id': owner_id, 'first_name': None, 'last_name': None, 'email': None}
 
-        return {
-            "id": self.id,
-            "title": self.title,
-            "description": self.description,
-            "price": float(self.price),
-            "latitude": float(self.latitude),
-            "longitude": float(self.longitude),
-            "owner": {
-                "id": owner_obj.id,
-                "first_name": owner_obj.first_name,
-                "last_name": owner_obj.last_name,
-                "email": owner_obj.email
-            } if owner_obj and hasattr(owner_obj, 'email') else None,
-            "created_at": self.created_at.isoformat() if isinstance(self.created_at, datetime) else str(self.created_at),
-            "updated_at": self.updated_at.isoformat() if isinstance(self.updated_at, datetime) else str(self.updated_at),
-            "amenities": [
-                {"id": a.id, "name": a.name} for a in amenities_list if hasattr(a, 'id') and hasattr(a, 'name')
+        amenity_ids = place_dict.pop('amenities', [])
+        if amenities_map and amenity_ids:
+            place_dict['amenities'] = [
+                amenities_map[a_id].to_dict()
+                for a_id in amenity_ids if a_id in amenities_map
             ]
-        }
+        else:
+             place_dict['amenities'] = []
+
+        place_dict['reviews'] = [r.to_dict() for r in reviews_map] if reviews_map else []
+
+
+        return place_dict
