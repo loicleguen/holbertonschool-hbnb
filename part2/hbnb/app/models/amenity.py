@@ -14,6 +14,9 @@ class Amenity(BaseModel):
         """Validates the Amenity object properties"""
         if not hasattr(self, 'name'):
             raise TypeError("name attribute is missing")
+        
+        if not hasattr(self, 'name') or not self.name:
+            raise ValueError("name cannot be empty")
             
         if not isinstance(self.name, str):
             raise TypeError("Name must be a string")
