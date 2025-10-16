@@ -150,13 +150,15 @@ class PlaceReviewList(Resource):
     @reviews_ns.response(404, 'Place not found')
     def get(self, place_id):
         """Get all reviews for a specific place"""
-        reviews = facade_instance.get_reviews_by_place(place_id)
+        reviews_data = facade_instance.get_reviews_by_place(place_id)
 
-        if reviews is None:
+        if reviews_data is None:
             reviews_ns.abort(404, 'Place not found')
 
+        reviews = reviews_data if isinstance(reviews_data, list) else [reviews_data]
+
         user_ids = {r.user_id for r in reviews if r.user_id}
-        
+
         users = {u.id: u for u in facade_instance.get_users_by_ids(list(user_ids))}
         place_obj = facade_instance.get_place(place_id)
         places = {place_id: place_obj} if place_obj else {}
