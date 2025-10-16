@@ -66,21 +66,24 @@ place_update_model = places_ns.model('PlaceUpdateInput', {
 @places_ns.route('/')
 class PlaceList(Resource):
     @places_ns.expect(place_model, validate=True)
-    @places_ns.response(201, 'Place registered successfully', place_response)
+    @places_ns.marshal_with(place_response, code=201)
+    @places_ns.response(400, 'Invalid input data')
+    @places_ns.response(404, 'Owner not found')
     def post(self):
-        """Register a new place"""
-        try:
-            place_data = request.get_json()
-            place = facade_instance.create_place(place_data)
+        """Create a new Place"""
+        data = places_ns.payload
+        owner_id = data.get('owner_id')
 
-            owner_obj = facade_instance.get_user(place.owner_id)
-            
-            return place.to_dict(owners_map={place.owner_id: owner_obj}), 201
-            
+        if not facade_instance.get_user(owner_id):
+            places_ns.abort(404, 'Owner not found')
+
+        try:
+            new_place = facade_instance.create_place(data)
+            return new_place.to_dict(users_map={owner_id: facade_instance.get_user(owner_id)}), 201
         except ValueError as e:
             places_ns.abort(400, str(e))
         except Exception as e:
-            places_ns.abort(500, f"Internal error: {str(e)}")
+             places_ns.abort(500, f"Internal Server Error: {str(e)}")
 
 
     @places_ns.marshal_list_with(place_response)
