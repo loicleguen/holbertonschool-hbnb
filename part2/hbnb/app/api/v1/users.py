@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from flask import request
 from app.services.facade import HBnBFacade
 
+
 # Namespace
 usersns = Namespace('users', description='User operations')
 
@@ -20,8 +21,6 @@ user_update_model = usersns.model('UserUpdate', {
     'last_name': fields.String(required=False, description='Last name of the user')
 })
 
-# Instance unique de la façade
-facade = HBnBFacade()
 
 # ---------------------------
 # Liste des utilisateurs et création
@@ -36,15 +35,8 @@ class UserList(Resource):
         """Register a new user"""
         user_data = request.get_json() or {}
 
-        # Vérifier les champs requis
-        required_fields = ['first_name', 'last_name', 'email', 'password']
-        for field in required_fields:
-            if field not in user_data:
-                return {'error': f'Missing required field: {field}'}, 400
-
-        # Créer l'utilisateur via la façade
         try:
-            new_user = facade.create_user(user_data)
+            new_user = usersns.facade.create_user(user_data)
         except (ValueError, TypeError) as e:
             return {'error': str(e)}, 400
         except Exception:
@@ -60,7 +52,7 @@ class UserList(Resource):
     @usersns.response(200, 'List of users retrieved successfully')
     def get(self):
         """List all users"""
-        users = facade.get_all_user()
+        users = usersns.facade.get_all_user()
         return [
             {
                 'id': u.id,
@@ -80,7 +72,7 @@ class UserResource(Resource):
     @usersns.response(404, 'User not found')
     def get(self, user_id):
         """Get user details by ID"""
-        user = facade.get_user(user_id)
+        user = usersns.facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
         return {
@@ -99,7 +91,7 @@ class UserResource(Resource):
         data = request.get_json() or {}
 
         try:
-            updated_user = facade.update_user(user_id, data)
+            updated_user = usersns.facade.update_user(user_id, data)
         except ValueError as e:
             return {'error': str(e)}, 400
 

@@ -4,7 +4,6 @@
 import uuid
 from datetime import datetime
 
-
 class BaseModel:
     """Base class for all models"""
 
@@ -37,8 +36,10 @@ class BaseModel:
         return result
 
     def update(self, data):
-        """Update attributes from dict"""
+        """Update attributes from dict, protect immutable fields"""
         for key, value in data.items():
+            if key in ['id', 'created_at']:
+                continue
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()

@@ -5,7 +5,6 @@ class Amenity(BaseModel):
         super().__init__(*args, **kwargs)
         self.name = kwargs.get("name", "")
 
-    @property
     def validate(self):
         if not isinstance(self.id, str):
             raise TypeError("id must be a string")
