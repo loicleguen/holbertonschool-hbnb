@@ -68,7 +68,39 @@ The API exposes standard RESTful endpoints.
 | **Amenities** | `GET`, `POST`, `PUT`, `DELETE` | `/api/v1/amenities` | Manage property features. |
 
 
+1.  **Create a user:**
+```bash
+curl -s -X POST http://localhost:5000/api/v1/users/ \
+  -H "Content-Type: application/json" \
+  -d '{"first_name": "Loic", "last_name": "Leguen", "email": "loic@example.com", "password": "mypassword123"}' \
+  | python3 -m json.tool
+```
+2.  **Create an Amenity:**
+```bash
+curl -s -X POST http://localhost:5000/api/v1/amenities/ \
+  -H "Content-Type: application/json" \
+  -d '{"name": "WiFi"}' \
+  | python3 -m json.tool
+```
+3.  **Create a Place:**
+```bash
+curl -s -X POST http://localhost:5000/api/v1/places/ \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Appartement Paris", "description": "Beau studio lumineux", "price": 120.0, "latitude": 48.8566, "longitude": 2.3522, "owner_id": "<USER_ID>", "amenities": ["<AMENITY_ID>"]}' \
+  | python3 -m json.tool
+```
+4.  **Create a Review:**
+```bash
+curl -s -X POST http://localhost:5000/api/v1/reviews/ \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Superbe séjour!", "rating": 4.5, "user_id": "<USER_ID>", "place_id": "<PLACE_ID>"}' \
+  | python3 -m json.tool
+```
+5.  **Delete a Review:**
+```bash
+curl -s -X DELETE http://localhost:5000/api/v1/reviews/<REVIEW_ID> | python3 -m json.tool
 
+```
 
 ---
 
