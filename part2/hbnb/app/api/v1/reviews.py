@@ -49,29 +49,24 @@ review_update_model = reviews_ns.model('ReviewUpdate', {
 class ReviewList(Resource):
     
     @reviews_ns.expect(review_model, validate=True)
-    @reviews_ns.marshal_with(review_response_model, code=201)
+    @reviews_ns.response(201, 'Review successfully created', review_response_model)
     @reviews_ns.response(400, 'Invalid input data')
-    @reviews_ns.response(404, 'User or Place not found')
     def post(self):
-        """Create a new Review"""
-        data = reviews_ns.payload
-        user_id = data.get('user_id')
-        place_id = data.get('place_id')
-
-        if not facade_instance.get_user(user_id):
-            reviews_ns.abort(404, 'User not found')
-        if not facade_instance.get_place(place_id):
-            reviews_ns.abort(404, 'Place not found')
+        """Register a new review"""
         try:
-            new_review = facade_instance.create_review(data)
-            user = facade_instance.get_user(new_review.user_id)
-            place = facade_instance.get_place(new_review.place_id)
+            review = facade_instance.create_review(reviews_ns.payload)
             
-            return new_review.to_dict(users_map={user_id: user}, places_map={place_id: place}), 201
-        except (ValueError, TypeError) as e:
+            user_obj = facade_instance.get_user(review.user_id)
+            place_obj = facade_instance.get_place(review.place_id)
+            
+            return review.to_dict(
+                users_map={review.user_id: user_obj},
+            ), 201
+            
+        except ValueError as e:
             reviews_ns.abort(400, str(e))
         except Exception as e:
-            reviews_ns.abort(500, f"Internal Server Error: {str(e)}")
+            reviews_ns.abort(500, f"Internal error: {str(e)}")
 
     @reviews_ns.marshal_list_with(review_response_model)
     @reviews_ns.response(200, 'List of reviews retrieved successfully')

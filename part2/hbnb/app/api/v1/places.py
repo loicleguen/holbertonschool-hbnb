@@ -66,39 +66,55 @@ place_update_model = places_ns.model('PlaceUpdateInput', {
 @places_ns.route('/')
 class PlaceList(Resource):
     @places_ns.expect(place_model, validate=True)
-    @places_ns.marshal_with(place_response, code=201)
-    @places_ns.response(400, 'Invalid input data')
-    @places_ns.response(404, 'Owner not found')
+    @places_ns.response(201, 'Place registered successfully', place_response)
     def post(self):
-        """Create a new Place"""
-        data = places_ns.payload
-        owner_id = data.get('owner_id')
-
-        if not facade_instance.get_user(owner_id):
-            places_ns.abort(404, 'Owner not found')
-
+        """Register a new place"""
         try:
-            new_place = facade_instance.create_place(data)
-            return new_place.to_dict(users_map={owner_id: facade_instance.get_user(owner_id)}), 201
+            place_data = request.get_json()
+            place = facade_instance.create_place(place_data)
+
+            owner_obj = facade_instance.get_user(place.owner_id)
+            
+            # Build amenities map (place.amenities contains objects)
+            amenities_map = {a.id: a for a in place.amenities}
+
+            # Build reviews map (empty on creation)
+            reviews_map = facade_instance.get_reviews_by_place(place.id)
+
+            return place.to_dict(
+                owners_map={place.owner_id: owner_obj} if owner_obj else None,
+                amenities_map=amenities_map,
+                reviews_map=reviews_map
+            ), 201
+            
         except ValueError as e:
             places_ns.abort(400, str(e))
         except Exception as e:
-             places_ns.abort(500, f"Internal Server Error: {str(e)}")
+            places_ns.abort(500, f"Internal error: {str(e)}")
 
 
     @places_ns.marshal_list_with(place_response)
     @places_ns.response(200, 'List of places retrieved successfully')
     def get(self):
-        """Retrieve all places with optimized owner and amenities fetching"""
+        """Retrieve all places with owner, amenities, and reviews"""
         places = facade_instance.get_all_places()
 
-        owner_ids = {p.owner_id for p in places if p.owner_id}
-        amenity_ids = {amenity_obj.id for p in places for amenity_obj in p.amenities if hasattr(amenity_obj, 'id')}
+        # Owners map
+        owners = {u.id: u for u in facade_instance.get_all_user()}
 
-        owners = {user.id: user for user in facade_instance.get_users_by_ids(list(owner_ids))}
-        amenities = {a.id: a for a in facade_instance.get_amenities_by_ids(list(amenity_ids))}
+        result = []
+        for p in places:
+            # Amenities map
+            amenities_map = {a.id: a for a in p.amenities}
 
-        result = [p.to_dict(owners_map=owners, amenities_map=amenities) for p in places]
+            # Reviews map
+            reviews_map = facade_instance.get_reviews_by_place(p.id)
+
+            result.append(p.to_dict(
+                owners_map={p.owner_id: owners.get(p.owner_id)},
+                amenities_map=amenities_map,
+                reviews_map=reviews_map
+            ))
 
         return result
 
@@ -116,14 +132,13 @@ class PlaceResource(Resource):
             places_ns.abort(404, 'Place not found')
 
         owner_obj = facade_instance.get_user(place.owner_id)
-
-        amenity_ids = {a.id for a in place.amenities if hasattr(a, 'id')}
-        amenities_map = {a.id: a for a in facade_instance.get_amenities_by_ids(list(amenity_ids))}
-
+        amenities_map = {a.id: a for a in place.amenities}
+        reviews_map = facade_instance.get_reviews_by_place(place.id)
 
         return place.to_dict(
             owners_map={place.owner_id: owner_obj} if owner_obj else None, 
-            amenities_map=amenities_map
+            amenities_map=amenities_map,
+            reviews_map=reviews_map
         )
 
     @places_ns.expect(place_update_model, validate=True)
@@ -139,14 +154,13 @@ class PlaceResource(Resource):
                 places_ns.abort(404, "Place not found")
 
             owner_obj = facade_instance.get_user(updated_place.owner_id)
-            
-            amenity_ids = {a.id for a in updated_place.amenities if hasattr(a, 'id')}
-            amenities_map = {a.id: a for a in facade_instance.get_amenities_by_ids(list(amenity_ids))}
-
+            amenities_map = {a.id: a for a in updated_place.amenities}
+            reviews_map = facade_instance.get_reviews_by_place(updated_place.id)
 
             return updated_place.to_dict(
                 owners_map={updated_place.owner_id: owner_obj},
-                amenities_map=amenities_map
+                amenities_map=amenities_map,
+                reviews_map=reviews_map
             )
             
         except ValueError as e:

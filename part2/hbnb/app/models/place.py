@@ -54,28 +54,50 @@ class Place(BaseModel):
 
     def to_dict(self, owners_map=None, amenities_map=None, reviews_map=None, **kwargs):
         """
-        Returns a dictionary representation of the Place, including nested objects,
-        and absorbing any extra arguments like 'safe'.
+        Returns a dictionary representation of the Place, including:
+        - owner (full user info)
+        - amenities (id + name)
+        - reviews (id + text + rating)
         """
-        place_dict = super().to_dict(**kwargs) 
+        place_dict = super().to_dict(**kwargs)
 
+        # ----- OWNER -----
         owner_id = place_dict.pop('owner_id', None)
         if owner_id and owners_map and owner_id in owners_map:
             owner_obj = owners_map[owner_id]
-            place_dict['owner'] = owner_obj.to_dict(safe=True) 
+            place_dict['owner'] = owner_obj.to_dict(safe=True)
         else:
-            place_dict['owner'] = {'id': owner_id, 'first_name': None, 'last_name': None, 'email': None}
+            place_dict['owner'] = {
+                'id': owner_id,
+                'first_name': None,
+                'last_name': None,
+                'email': None
+            }
 
+        # ----- AMENITIES -----
         amenity_ids = place_dict.pop('amenities', [])
+        place_dict['amenities'] = []
         if amenities_map and amenity_ids:
-            place_dict['amenities'] = [
-                amenities_map[a_id].to_dict()
-                for a_id in amenity_ids if a_id in amenities_map
-            ]
-        else:
-             place_dict['amenities'] = []
+            for a in amenity_ids:
+                if a in amenities_map:
+                    place_dict['amenities'].append(amenities_map[a].to_dict())
+                elif hasattr(a, 'to_dict'):
+                    place_dict['amenities'].append(a.to_dict())
+                else:
+                    place_dict['amenities'].append({'id': a})
 
-        place_dict['reviews'] = [r.to_dict() for r in reviews_map] if reviews_map else []
-
+        # ----- REVIEWS -----
+        place_dict['reviews'] = []
+        if reviews_map:
+            for r in reviews_map:
+                if hasattr(r, 'to_dict'):
+                    place_dict['reviews'].append(r.to_dict())
+                else:
+                    place_dict['reviews'].append({
+                        'id': getattr(r, 'id', None),
+                        'text': getattr(r, 'text', None),
+                        'rating': getattr(r, 'rating', None)
+                    })
 
         return place_dict
+
