@@ -61,7 +61,6 @@ class ReviewList(Resource):
             
             return review.to_dict(
                 users_map={review.user_id: user_obj},
-                places_map={review.place_id: place_obj}
             ), 201
             
         except ValueError as e:
