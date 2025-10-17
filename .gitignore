@@ -1,0 +1,11 @@
+venv
+# Ignore everything
+*__pychache__
+# But not these file types:
+!*.py
+!*.md
+# Ignore all main.py & .pyc files explicitly
+*main*.py
+*.pyc
+.gitignore
+*.csv
