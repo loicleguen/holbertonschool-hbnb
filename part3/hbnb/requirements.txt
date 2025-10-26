@@ -1,6 +1,0 @@
-flask
-flask-restx
-email_validator
-unittest
-json
-app
