@@ -5,14 +5,17 @@ from app.services.facade import HBnBFacade
 from flask import Flask
 from flask_restx import Api
 from config import DevelopmentConfig
+from flask_bcrypt import Bcrypt
 
 
 facade = HBnBFacade()
+bcrypt = Bcrypt()
 
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    bcrypt.init_app(app)
 
     # Initialisez l'API ici, en lui disant où servir la documentation (doc='/')
     # C'est la configuration par défaut, mais c'est bien de le savoir.

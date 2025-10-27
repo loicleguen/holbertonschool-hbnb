@@ -1,11 +1,13 @@
 from .BaseModel import BaseModel
 from email_validator import validate_email, EmailNotValidError
-# bcrypt import removed
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
 
 class User(BaseModel):
     # Defining class attributes here ensures they exist on the instance
     email = ""
-    # password removed
+    password = ""
     first_name = ""
     last_name = ""
     
@@ -15,6 +17,14 @@ class User(BaseModel):
         and setting attributes from kwargs if provided (e.g., deserialization).
         """
         super().__init__(*args, **kwargs)
+
+    def hash_password(self, password):
+        """Hashes the password before storing it."""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Verifies if the provided password matches the hashed password."""
+        return bcrypt.check_password_hash(self.password, password)
 
     def validate(self):
         # Validation checks
