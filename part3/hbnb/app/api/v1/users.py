@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import facade as facade_instance
+from flask_jwt_extended import jwt_required
 
 
 users_ns = Namespace('users', description='User operations')
@@ -10,6 +11,7 @@ user_model = users_ns.model('UserInput', {
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
     'password': fields.String(required=True, description='Password of the user'),
+    'is_admin': fields.Boolean(description='Administrative rights flag (default: False)', default=False)
 })
 
 # User model for API Response
@@ -17,13 +19,17 @@ user_response_model = users_ns.model('UserResponse', {
     'id': fields.String(description='User unique identifier'),
     'first_name': fields.String(description='First name of the user'),
     'last_name': fields.String(description='Last name of the user'),
-    'email': fields.String(description='Email of the user')
+    'email': fields.String(description='Email of the user'),
+    'is_admin': fields.Boolean(description='Administrative rights flag'),
+    'created_at': fields.String(description='The timestamp of creation'),
+    'updated_at': fields.String(description='The timestamp of last update')
 })
 
 # Model for user update (PUT)
 user_update_model = users_ns.model('UserUpdateInput', {
     'first_name': fields.String(required=False, description='First name of the user'),
-    'last_name': fields.String(required=False, description='Last name of the user')
+    'last_name': fields.String(required=False, description='Last name of the user'),
+    'password': fields.String(description='New password (min 6 characters)', min_length=6, required=False)
 })
 
 
@@ -37,6 +43,7 @@ class UserList(Resource):
     @users_ns.response(201, 'User successfully created', user_response_model)
     @users_ns.response(400, 'Email already registered or invalid input')
     @users_ns.response(500, 'Internal server error')
+    @jwt_required()
     def post(self):
         """Register a new user"""
         user_data = request.get_json() or {}
@@ -52,6 +59,7 @@ class UserList(Resource):
 
     @users_ns.marshal_list_with(user_response_model)
     @users_ns.response(200, 'List of users retrieved successfully')
+    @jwt_required()
     def get(self):
         """List all users"""
         users = facade_instance.get_all_user()
