@@ -31,7 +31,7 @@ You need **Python 3.x** installed on your system.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/loicleguen/holbertonschool-hbnb/tree/main/part2](https://github.com/loicleguen/holbertonschool-hbnb/tree/main/part2)
+    git clone https://github.com/loicleguen/holbertonschool-hbnb/tree/main/part2
     cd hbnb
     ```
 
