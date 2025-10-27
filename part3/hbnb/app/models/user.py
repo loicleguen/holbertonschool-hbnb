@@ -10,6 +10,7 @@ class User(BaseModel):
     password = ""
     first_name = ""
     last_name = ""
+    is_admin = False  # Ajout pour JWT claims
     
     def __init__(self, *args, **kwargs):
         """
@@ -17,6 +18,10 @@ class User(BaseModel):
         and setting attributes from kwargs if provided (e.g., deserialization).
         """
         super().__init__(*args, **kwargs)
+
+        # Si is_admin n'est pas fourni, le mettre à False par défaut
+        if not hasattr(self, 'is_admin') or self.is_admin is None:
+            self.is_admin = False
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
@@ -64,3 +69,10 @@ class User(BaseModel):
         
         self.validate()
         super().save()
+
+    def to_dict(self):
+        """Return dictionary representation without password"""
+        data = super().to_dict()
+        # Never expose password in API responses
+        data.pop('password', None)
+        return data

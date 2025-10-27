@@ -1,5 +1,4 @@
 from app.persistence.repository import InMemoryRepository
-from datetime import datetime
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
@@ -25,11 +24,13 @@ class HBnBFacade:
 
         user = User()
         for k, v in user_data.items():
-            setattr(user, k, v)
+            if k == 'password':
+                user.hash_password(v)  # Utilise ta méthode hash_password
+            else:
+                setattr(user, k, v)
         
         # KEY FIX: Call save() to run validation (password hashing removed from User.save())
         user.save() 
-        
         self.user_repo.add(user)
         return user
 
@@ -53,6 +54,12 @@ class HBnBFacade:
         for field in ['id', 'email', 'created_at']: # updated_at must be updated by save()
             if field in data:
                 raise ValueError(f"Cannot update '{field}'")
+            
+        # Si le mot de passe est dans les données, le hasher avant de mettre à jour
+        if 'password' in data:
+            user.hash_password(data['password'])
+            del data['password']  # Retirer du dict car déjà traité
+
         user.update(data) # user.update() calls user.save() internally
         return user
 
