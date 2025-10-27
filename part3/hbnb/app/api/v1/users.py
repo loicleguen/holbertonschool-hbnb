@@ -11,7 +11,6 @@ user_model = users_ns.model('UserInput', {
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
     'password': fields.String(required=True, description='Password of the user'),
-    'is_admin': fields.Boolean(description='Administrative rights flag (default: False)', default=False)
 })
 
 # User model for API Response
@@ -20,7 +19,7 @@ user_response_model = users_ns.model('UserResponse', {
     'first_name': fields.String(description='First name of the user'),
     'last_name': fields.String(description='Last name of the user'),
     'email': fields.String(description='Email of the user'),
-    'is_admin': fields.Boolean(description='Administrative rights flag'),
+    'is_admin': fields.Boolean(description='Administrative rights flag (default: False)', default=False),
     'created_at': fields.String(description='The timestamp of creation'),
     'updated_at': fields.String(description='The timestamp of last update')
 })
@@ -43,7 +42,6 @@ class UserList(Resource):
     @users_ns.response(201, 'User successfully created', user_response_model)
     @users_ns.response(400, 'Email already registered or invalid input')
     @users_ns.response(500, 'Internal server error')
-    @jwt_required()
     def post(self):
         """Register a new user"""
         user_data = request.get_json() or {}
@@ -59,7 +57,6 @@ class UserList(Resource):
 
     @users_ns.marshal_list_with(user_response_model)
     @users_ns.response(200, 'List of users retrieved successfully')
-    @jwt_required()
     def get(self):
         """List all users"""
         users = facade_instance.get_all_user()
