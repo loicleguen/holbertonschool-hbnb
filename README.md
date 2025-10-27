@@ -20,7 +20,7 @@ This repository contains the HBnB project, developed in four progressive parts, 
 ## HBnB - BL and API
 1.  **Layered Architecture:** Implemented a clean separation of concerns:
     * **Persistence Layer ([`app/persistence`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence)):** Abstracted data storage logic via a generic [`repository`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence/repository.py).
-    * **Service Layer ([`app/services`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/service)):** Established a [`facade`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/service/facade) for centralized business logic.
+    * **Service Layer ([`app/services`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/services)):** Established a [`facade`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/services/facade.py) for centralized business logic.
     * **API Layer ([`app/api`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api)):** Defined clear, standard REST endpoints using Flask Blueprints.
 2.  **Core Resource Management:** Full **CRUD** (Create, Read, Update, Delete) functionality was implemented for the following resources:
     * [**Users**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/users.py)
