@@ -17,17 +17,6 @@ This repository contains the HBnB project, developed in four progressive parts, 
 - [2. Sequence Diagrams for API Calls.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/2.%20Sequence%20Diagrams%20for%20API%20Calls.md): four UML Sequence Diagrams to map the flow of information for key API calls across the three layers
 - [3. Documentation Compilation.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/3.%20Documentation%20Compilation.md): a compilation of all diagrams and notes into a single, comprehensive Technical Document.
 
-## HBnB - BL and API
-1.  **Layered Architecture:** Implemented a clean separation of concerns:
-    * **Persistence Layer ([`app/persistence`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence)):** Abstracted data storage logic via a generic [`repository`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence/repository.py).
-    * **Service Layer ([`app/services`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/service)):** Established a [`facade`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/service/facade) for centralized business logic.
-    * **API Layer ([`app/api`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api)):** Defined clear, standard REST endpoints using Flask Blueprints.
-2.  **Core Resource Management:** Full **CRUD** (Create, Read, Update, Delete) functionality was implemented for the following resources:
-    * [**Users**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/users.py)
-    * [**Places**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/places.py)
-    * [**Reviews**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/reviews.py)
-    * [**Amenities**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/amenities.py)
-3.  **Environment Setup:** Finalized project configuration [`config.py`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/config.py) and dependency management [`requirements.txt`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/requirements.txt).
 
 ## Authors
 <div align="center">
