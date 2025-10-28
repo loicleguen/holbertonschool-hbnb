@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import facade as facade_instance
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
 users_ns = Namespace('users', description='User operations')
@@ -79,13 +79,24 @@ class UserResource(Resource):
             users_ns.abort(404, 'User not found')
         return user.to_dict()
 
+    @jwt_required()  # 🔒 PROTECTED: User must be authenticated
     @users_ns.expect(user_update_model, validate=True)
     @users_ns.marshal_with(user_response_model) 
     @users_ns.response(200, 'User successfully updated')
     @users_ns.response(400, 'Invalid input data')
+    @users_ns.response(403, 'Unauthorized action')
     @users_ns.response(404, 'User not found')
     def put(self, user_id):
-        """Update an existing user by ID"""
+        """Update an existing user by ID (Protected - users can only update their own profile)"""
+        current_user_id = get_jwt_identity()
+        
+        # Users can only update their own profile unless they're admin
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+        
+        if current_user_id != user_id and not is_admin:
+            users_ns.abort(403, 'Unauthorized action')
+        
         data = request.get_json() or {}
 
         try:
@@ -98,10 +109,18 @@ class UserResource(Resource):
 
         return updated_user.to_dict()
 
-    @users_ns.response(204, 'User successfully deleted')
+    @jwt_required()  # 🔒 PROTECTED: Only admins can delete users
+    @users_ns.response(200, 'User successfully deleted')
+    @users_ns.response(403, 'Unauthorized action - Admin privileges required')
     @users_ns.response(404, 'User not found')
     def delete(self, user_id):
-        """Delete a user by ID"""
+        """Delete a user by ID (Protected - admin only)"""
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+        
+        if not is_admin:
+            users_ns.abort(403, 'Admin privileges required')
+        
         deleted = facade_instance.delete_user(user_id)
         if not deleted:
             users_ns.abort(404, 'User not found')

@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import facade as facade_instance
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
 places_ns = Namespace('places', description='Place operations')
@@ -65,12 +66,22 @@ place_update_model = places_ns.model('PlaceUpdateInput', {
 # -----------------------
 @places_ns.route('/')
 class PlaceList(Resource):
+    @jwt_required()  # 🔒 PROTECTED: User must be authenticated to create a place
     @places_ns.expect(place_model, validate=True)
     @places_ns.response(201, 'Place registered successfully', place_response)
+    @places_ns.response(400, 'Invalid input data')
+    @places_ns.response(403, 'Unauthorized action')
     def post(self):
-        """Register a new place"""
+        """Register a new place (Protected - authentication required)"""
+        current_user_id = get_jwt_identity()
+        
         try:
             place_data = request.get_json()
+            
+            # Verify that the owner_id matches the authenticated user
+            if place_data.get('owner_id') != current_user_id:
+                places_ns.abort(403, 'You can only create places for yourself')
+            
             place = facade_instance.create_place(place_data)
 
             owner_obj = facade_instance.get_user(place.owner_id)
@@ -96,7 +107,7 @@ class PlaceList(Resource):
     @places_ns.marshal_list_with(place_response)
     @places_ns.response(200, 'List of places retrieved successfully')
     def get(self):
-        """Retrieve all places with owner, amenities, and reviews"""
+        """Retrieve all places with owner, amenities, and reviews (Public)"""
         places = facade_instance.get_all_places()
 
         # Owners map
@@ -126,7 +137,7 @@ class PlaceResource(Resource):
     @places_ns.response(404, 'Place not found')
     @places_ns.response(200, 'Place details retrieved successfully')
     def get(self, place_id):
-        """Get place details by ID"""
+        """Get place details by ID (Public)"""
         place = facade_instance.get_place(place_id)
         if not place:
             places_ns.abort(404, 'Place not found')
@@ -141,17 +152,30 @@ class PlaceResource(Resource):
             reviews_map=reviews_map
         )
 
+    @jwt_required()  # 🔒 PROTECTED: Owner or admin only
     @places_ns.expect(place_update_model, validate=True)
     @places_ns.response(200, 'Place updated successfully', place_response)
     @places_ns.response(404, 'Place not found')
     @places_ns.response(400, 'Invalid input data')
+    @places_ns.response(403, 'Unauthorized action')
     def put(self, place_id):
-        """Update a place"""
+        """Update a place (Protected - owner or admin only)"""
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+        
+        # Get the place to check ownership
+        place = facade_instance.get_place(place_id)
+        if not place:
+            places_ns.abort(404, "Place not found")
+        
+        # Check if user is owner or admin
+        if place.owner_id != current_user_id and not is_admin:
+            places_ns.abort(403, 'You can only update your own places')
+        
         try:
             place_data = request.get_json()
             updated_place = facade_instance.update_place(place_id, place_data)
-            if not updated_place:
-                places_ns.abort(404, "Place not found")
 
             owner_obj = facade_instance.get_user(updated_place.owner_id)
             amenities_map = {a.id: a for a in updated_place.amenities}
@@ -168,11 +192,24 @@ class PlaceResource(Resource):
         except Exception as e:
             places_ns.abort(500, f"Internal error: {str(e)}")
 
+    @jwt_required()  # 🔒 PROTECTED: Owner or admin only
     @places_ns.response(204, 'Place successfully deleted')
     @places_ns.response(404, 'Place not found')
+    @places_ns.response(403, 'Unauthorized action')
     def delete(self, place_id):
-        """Delete a place by ID"""
-        deleted = facade_instance.delete_place(place_id)
-        if not deleted:
+        """Delete a place by ID (Protected - owner or admin only)"""
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+        
+        # Get the place to check ownership
+        place = facade_instance.get_place(place_id)
+        if not place:
             places_ns.abort(404, 'Place not found')
+        
+        # Check if user is owner or admin
+        if place.owner_id != current_user_id and not is_admin:
+            places_ns.abort(403, 'You can only delete your own places')
+        
+        deleted = facade_instance.delete_place(place_id)
         return {}, 204

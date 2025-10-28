@@ -19,24 +19,24 @@ def create_app(config_class=DevelopmentConfig):
     bcrypt.init_app(app)
     jwt.init_app(app)
 
-    # Initialisez l'API ici, en lui disant où servir la documentation (doc='/')
-    # C'est la configuration par défaut, mais c'est bien de le savoir.
+    # Initialize the API here, specifying where to serve the documentation (doc='/')
+    # This is the default configuration, but it's good to be aware of it.
     api = Api(
         app,
         version='1.0',
         title='HBnB API',
         description='A simple API for HBnB by Loic & Val',
-        doc='/'  # URL pour la documentation Swagger
+        doc='/'  # URL for Swagger documentation
     )
 
-    # Importez chaque namespace directement depuis son fichier
+    # Import each namespace directly from its file
     from .api.v1.users import users_ns
     from .api.v1.places import places_ns
     from .api.v1.reviews import reviews_ns
     from .api.v1.amenities import amenities_ns
     from .api.v1.auth import auth_ns
 
-    # Ajoutez chaque namespace à l'API avec son préfixe de chemin
+    # Add each namespace to the API with its path prefix
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
