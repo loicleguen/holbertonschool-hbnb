@@ -1,14 +1,25 @@
 from .BaseModel import BaseModel
 
 class Amenity(BaseModel):
-    def __init__(self, name=None, *args, **kwargs):
+    # Class attributes
+    name = ""
+    owner_id = None  # ID of the user who created this amenity
+    
+    def __init__(self, name=None, owner_id=None, *args, **kwargs):
         # BaseModel handles id, created_at, updated_at, and deserializes kwargs
         super().__init__(*args, **kwargs) 
         
+        # Set name
         if name is not None:
             self.name = name
         elif not hasattr(self, 'name'):
             self.name = kwargs.get("name", "")
+        
+        # Set owner_id
+        if owner_id is not None:
+            self.owner_id = owner_id
+        elif not hasattr(self, 'owner_id'):
+            self.owner_id = kwargs.get("owner_id", None)
 
     def validate(self):
         """Validates the Amenity object properties"""
@@ -21,3 +32,23 @@ class Amenity(BaseModel):
             raise ValueError("Name must be between 1 and 50 characters")
         
         return True
+
+    def save(self):
+        """Save the amenity after validation"""
+        self.validate()
+        super().save()
+
+    def update(self, data):
+        """Update amenity attributes with provided data"""
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        self.validate()
+        super().save()
+
+    def to_dict(self):
+        """Return dictionary representation of the amenity"""
+        data = super().to_dict()
+        if self.owner_id:
+            data['owner_id'] = self.owner_id
+        return data

@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import facade as facade_instance
-from flask_jwt_extended import jwt_required, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 amenities_ns = Namespace('amenities', description='Amenity operations')
 
@@ -15,6 +15,7 @@ amenity_model = amenities_ns.model('AmenityInput', {
 amenity_response_model = amenities_ns.model('AmenityResponse', {
     'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity'),
+    'owner_id': fields.String(description='ID of the owner who created the amenity'),
     'created_at': fields.String(description='Creation timestamp'),
     'updated_at': fields.String(description='Last update timestamp')
 })
@@ -26,21 +27,20 @@ amenity_response_model = amenities_ns.model('AmenityResponse', {
 @amenities_ns.route('/')
 class AmenityList(Resource):
     
-    @jwt_required()  # 🔒 PROTECTED: Admin only
+    @jwt_required()  # Protected: Authentication required
     @amenities_ns.expect(amenity_model, validate=True)
     @amenities_ns.response(201, 'Amenity successfully created', amenity_response_model)
     @amenities_ns.response(400, 'Invalid input data')
-    @amenities_ns.response(403, 'Admin privileges required')
+    @amenities_ns.response(401, 'Authentication required')
     def post(self):
-        """Register a new amenity (Protected - admin only)"""
-        claims = get_jwt()
-        is_admin = claims.get('is_admin', False)
-        
-        if not is_admin:
-            amenities_ns.abort(403, 'Admin privileges required')
+        """Register a new amenity (Protected - authenticated users only)"""
+        current_user_id = get_jwt_identity()
         
         try:
             amenity_data = amenities_ns.payload
+            # Add the owner_id of the authenticated user
+            amenity_data['owner_id'] = current_user_id
+            
             new_amenity = facade_instance.create_amenity(amenity_data)
             return new_amenity.to_dict(), 201
             
@@ -71,20 +71,27 @@ class AmenityResource(Resource):
             amenities_ns.abort(404, 'Amenity not found')
         return amenity.to_dict()
 
-    @jwt_required()  # 🔒 PROTECTED: Admin only
+    @jwt_required()  # Protected: Owner or admin only
     @amenities_ns.expect(amenity_model, validate=True)
     @amenities_ns.marshal_with(amenity_response_model)
     @amenities_ns.response(200, 'Amenity updated successfully')
     @amenities_ns.response(404, 'Amenity not found')
     @amenities_ns.response(400, 'Invalid input data')
-    @amenities_ns.response(403, 'Admin privileges required')
+    @amenities_ns.response(403, 'Unauthorized action')
     def put(self, amenity_id):
-        """Update an amenity's information (Protected - admin only)"""
+        """Update an amenity (Protected - owner or admin only)"""
+        current_user_id = get_jwt_identity()
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
         
-        if not is_admin:
-            amenities_ns.abort(403, 'Admin privileges required')
+        # Get the amenity to check ownership
+        amenity = facade_instance.get_amenity(amenity_id)
+        if not amenity:
+            amenities_ns.abort(404, 'Amenity not found')
+        
+        # Check if user is owner or admin
+        if amenity.owner_id != current_user_id and not is_admin:
+            amenities_ns.abort(403, 'You can only update your own amenities')
         
         try:
             amenity_data = amenities_ns.payload
@@ -100,17 +107,24 @@ class AmenityResource(Resource):
         except Exception as e:
             amenities_ns.abort(500, f"Internal error: {str(e)}")
 
-    @jwt_required()  # 🔒 PROTECTED: Admin only
+    @jwt_required()  # Protected: Owner or admin only
     @amenities_ns.response(204, 'Amenity deleted successfully')
     @amenities_ns.response(404, 'Amenity not found')
-    @amenities_ns.response(403, 'Admin privileges required')
+    @amenities_ns.response(403, 'Unauthorized action')
     def delete(self, amenity_id):
-        """Delete an amenity (Protected - admin only)"""
+        """Delete an amenity (Protected - owner or admin only)"""
+        current_user_id = get_jwt_identity()
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
         
-        if not is_admin:
-            amenities_ns.abort(403, 'Admin privileges required')
+        # Get the amenity to check ownership
+        amenity = facade_instance.get_amenity(amenity_id)
+        if not amenity:
+            amenities_ns.abort(404, 'Amenity not found')
+        
+        # Check if user is owner or admin
+        if amenity.owner_id != current_user_id and not is_admin:
+            amenities_ns.abort(403, 'You can only delete your own amenities')
         
         if facade_instance.delete_amenity(amenity_id):
             return {}, 204

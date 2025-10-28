@@ -82,12 +82,14 @@ class HBnBFacade:
 
     # --- Amenities ---
     def create_amenity(self, amenity_data):
+        """Create a new amenity with owner information"""
         name = amenity_data.get("name")
+        owner_id = amenity_data.get("owner_id")  # Get the owner_id
+        
         if not name:
             raise ValueError("Amenity name is required")
-        
-        # Pass kwargs to constructor for proper BaseModel initialization
-        amenity = Amenity(name=name) 
+    
+        amenity = Amenity(name=name, owner_id=owner_id)
         amenity.validate()
         self.amenity_repo.add(amenity)
         return amenity
