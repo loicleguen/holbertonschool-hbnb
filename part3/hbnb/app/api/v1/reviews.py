@@ -49,11 +49,12 @@ review_update_model = reviews_ns.model('ReviewUpdate', {
 @reviews_ns.route('/')
 class ReviewList(Resource):
     
-    @jwt_required()  # 🔒 PROTECTED: User must be authenticated to create a review
+    @jwt_required()  # Protected: Authentication required
     @reviews_ns.expect(review_model, validate=True)
     @reviews_ns.response(201, 'Review successfully created', review_response_model)
     @reviews_ns.response(400, 'Invalid input data')
     @reviews_ns.response(403, 'Unauthorized action')
+    @reviews_ns.response(409, 'User has already reviewed this place')
     def post(self):
         """Register a new review (Protected - authentication required)"""
         current_user_id = get_jwt_identity()
@@ -64,6 +65,21 @@ class ReviewList(Resource):
             # Verify that the user_id matches the authenticated user
             if review_data.get('user_id') != current_user_id:
                 reviews_ns.abort(403, 'You can only create reviews for yourself')
+            
+            place_id = review_data.get('place_id')
+            
+            # Check if the place exists and get the owner
+            place = facade_instance.get_place(place_id)
+            if not place:
+                reviews_ns.abort(404, 'Place not found')
+            
+            # Check if user is trying to review their own place
+            if place.owner_id == current_user_id:
+                reviews_ns.abort(403, 'You cannot review your own place')
+            
+            # Check if user has already reviewed this place using facade method
+            if facade_instance.user_has_reviewed_place(current_user_id, place_id):
+                reviews_ns.abort(409, 'You have already reviewed this place')
             
             review = facade_instance.create_review(review_data)
             
