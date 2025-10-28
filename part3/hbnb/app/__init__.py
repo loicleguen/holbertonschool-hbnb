@@ -19,14 +19,25 @@ def create_app(config_class=DevelopmentConfig):
     bcrypt.init_app(app)
     jwt.init_app(app)
 
-    # Initialize the API here, specifying where to serve the documentation (doc='/')
-    # This is the default configuration, but it's good to be aware of it.
+    # Configure JWT authorization in Swagger
+    authorizations = {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token"
+        }
+    }
+
+    # Initialize the API with JWT authorization support
     api = Api(
         app,
         version='1.0',
         title='HBnB API',
         description='A simple API for HBnB by Loic & Val',
-        doc='/'  # URL for Swagger documentation
+        doc='/',
+        authorizations=authorizations,  # Add JWT configuration
+        security='Bearer'  # Apply globally (can be overridden per endpoint)
     )
 
     # Import each namespace directly from its file
