@@ -109,19 +109,21 @@ class UserResource(Resource):
 
         return updated_user.to_dict()
 
-    @jwt_required()  # 🔒 PROTECTED: Only admins can delete users
+    @jwt_required()  # Protected: User can delete themselves or admin can delete anyone
     @users_ns.response(200, 'User successfully deleted')
-    @users_ns.response(403, 'Unauthorized action - Admin privileges required')
+    @users_ns.response(403, 'Unauthorized action')
     @users_ns.response(404, 'User not found')
     def delete(self, user_id):
-        """Delete a user by ID (Protected - admin only)"""
+        """Delete a user by ID (Protected - user can delete themselves or admin can delete anyone)"""
+        current_user_id = get_jwt_identity()
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
         
-        if not is_admin:
-            users_ns.abort(403, 'Admin privileges required')
+        # User can delete themselves OR admin can delete anyone
+        if current_user_id != user_id and not is_admin:
+            users_ns.abort(403, 'Unauthorized action - You can only delete your own account')
         
         deleted = facade_instance.delete_user(user_id)
         if not deleted:
             users_ns.abort(404, 'User not found')
-        return {"message": "User is deleted"}, 200
+        return {"message": "User successfully deleted"}, 200
