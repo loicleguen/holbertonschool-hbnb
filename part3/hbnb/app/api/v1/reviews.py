@@ -142,16 +142,18 @@ class ReviewResource(Resource):
     @reviews_ns.response(400, 'Invalid input data')
     @reviews_ns.response(403, 'Unauthorized action')
     def put(self, review_id):
-        """Update a review's information (Protected - author only)"""
+        """Update a review's information (Protected - author or admin)"""
         current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
         
         # Get the review to check authorship
         review = facade_instance.get_review(review_id)
         if not review:
             reviews_ns.abort(404, 'Review not found')
         
-        # Check if user is the author
-        if review.user_id != current_user_id:
+        # Check if user is the author or admin
+        if review.user_id != current_user_id and not is_admin:
             reviews_ns.abort(403, 'You can only update your own reviews')
         
         try:

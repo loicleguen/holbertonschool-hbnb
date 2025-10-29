@@ -79,7 +79,7 @@ class UserResource(Resource):
             users_ns.abort(404, 'User not found')
         return user.to_dict()
 
-    @jwt_required()  # 🔒 PROTECTED: User must be authenticated
+    @jwt_required()  # Protected: Users can update their profile, admins can update any user
     @users_ns.expect(user_update_model, validate=True)
     @users_ns.marshal_with(user_response_model) 
     @users_ns.response(200, 'User successfully updated')
@@ -87,41 +87,52 @@ class UserResource(Resource):
     @users_ns.response(403, 'Unauthorized action')
     @users_ns.response(404, 'User not found')
     def put(self, user_id):
-        """Update an existing user by ID (Protected - users can only update their own profile)"""
+        """Update an existing user by ID (Protected - users can update their profile, admins can update any user)"""
         current_user_id = get_jwt_identity()
-        
-        # Users can only update their own profile unless they're admin
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
         
+        # Check if user can modify this profile
         if current_user_id != user_id and not is_admin:
             users_ns.abort(403, 'Unauthorized action')
         
-        data = request.get_json() or {}
+        data = users_ns.payload
+
+        # For non-admin users, block email and password changes
+        if not is_admin:
+            if 'email' in data:
+                users_ns.abort(403, 'You cannot change your email address')
+            if 'password' in data:
+                users_ns.abort(403, 'Password cannot be changed via this endpoint. Use /auth/change-password instead')
+
+        # For admin users, check email uniqueness if email is being changed
+        if is_admin and 'email' in data:
+            existing_user = facade_instance.get_user_by_email(data['email'])
+            if existing_user and existing_user.id != user_id:
+                users_ns.abort(400, 'Email already in use')
 
         try:
             updated_user = facade_instance.update_user(user_id, data)
         except ValueError as e:
-            users_ns.abort(400, message=str(e))
+            users_ns.abort(400, str(e))
 
         if not updated_user:
             users_ns.abort(404, 'User not found')
 
         return updated_user.to_dict()
 
-    @jwt_required()  # Protected: User can delete themselves or admin can delete anyone
+    @jwt_required()  # Protected: Admin only
     @users_ns.response(200, 'User successfully deleted')
-    @users_ns.response(403, 'Unauthorized action')
+    @users_ns.response(403, 'Admin privileges required')
     @users_ns.response(404, 'User not found')
     def delete(self, user_id):
-        """Delete a user by ID (Protected - user can delete themselves or admin can delete anyone)"""
-        current_user_id = get_jwt_identity()
+        """Delete a user by ID (Protected - admin only)"""
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
         
-        # User can delete themselves OR admin can delete anyone
-        if current_user_id != user_id and not is_admin:
-            users_ns.abort(403, 'Unauthorized action - You can only delete your own account')
+        # Only admins can delete users
+        if not is_admin:
+            users_ns.abort(403, 'Admin privileges required')
         
         deleted = facade_instance.delete_user(user_id)
         if not deleted:
