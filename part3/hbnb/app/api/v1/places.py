@@ -45,7 +45,7 @@ place_response = places_ns.model('PlaceResponse', {
     'price': fields.Float(description='Price per night'),
     'latitude': fields.Float(description='Latitude'),
     'longitude': fields.Float(description='Longitude'),
-    'owner_id': fields.String(description='Owner ID'),
+    'owner': fields.Nested(user_model),
     'created_at': fields.String(description='Creation timestamp'),
     'updated_at': fields.String(description='Last update timestamp'),
     'amenities': fields.List(fields.Nested(amenity_model)),
