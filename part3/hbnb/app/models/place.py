@@ -65,7 +65,7 @@ class Place(BaseModel):
         owner_id = place_dict.pop('owner_id', None)
         if owner_id and owners_map and owner_id in owners_map:
             owner_obj = owners_map[owner_id]
-            place_dict['owner'] = owner_obj.to_dict(safe=True)
+            place_dict['owner'] = owner_obj.to_dict()
         else:
             place_dict['owner'] = {
                 'id': owner_id,
