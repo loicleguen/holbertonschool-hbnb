@@ -211,5 +211,5 @@ class PlaceResource(Resource):
         if place.owner_id != current_user_id and not is_admin:
             places_ns.abort(403, 'You can only delete your own places')
         
-        deleted = facade_instance.delete_place(place_id)
+        facade_instance.delete_place(place_id)
         return {}, 204
