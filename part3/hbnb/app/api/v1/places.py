@@ -36,7 +36,6 @@ place_model = places_ns.model('PlaceInput', {
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, description="List of amenity IDs")
 })
 
 place_response = places_ns.model('PlaceResponse', {
@@ -46,7 +45,7 @@ place_response = places_ns.model('PlaceResponse', {
     'price': fields.Float(description='Price per night'),
     'latitude': fields.Float(description='Latitude'),
     'longitude': fields.Float(description='Longitude'),
-    'owner': fields.Nested(user_model),
+    'owner_id': fields.String(description='Owner ID'),
     'created_at': fields.String(description='Creation timestamp'),
     'updated_at': fields.String(description='Last update timestamp'),
     'amenities': fields.List(fields.Nested(amenity_model)),
