@@ -1,67 +1,80 @@
-from app.persistence.repository import SQLAlchemyRepository
+from app.persistence.UserRepository import UserRepository  # ← NOUVEAU
+from app.persistence.repository import InMemoryRepository  # ← GARDER pour les autres entités
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
-from app.persistence.UserRepository import UserRepository
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = UserRepository()
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
+        self.user_repo = UserRepository()  # ← CHANGER InMemoryRepository en UserRepository
+        self.amenity_repo = InMemoryRepository()  # ← GARDER pour l'instant
+        self.place_repo = InMemoryRepository()  # ← GARDER pour l'instant
+        self.review_repo = InMemoryRepository()  # ← GARDER pour l'instant
 
 
     # --- Users ---
 
     def create_user(self, user_data):
+        """Create a new user with SQLAlchemy"""
         email = user_data.get('email')
         if not email:
             raise ValueError("Email is required")
-        if self.get_user_by_email(email):
+        
+        # Check if email already exists using repository method
+        if self.user_repo.get_user_by_email(email):
             raise ValueError("Email already registered")
 
-
+        # Create user instance (password hashing happens in __init__)
         user = User(**user_data)
-        for k, v in user_data.items():
-            if k == 'password':
-                user.hash_password(v)  # Utilise ta méthode hash_password
-            else:
-                setattr(user, k, v)
         
-        # KEY FIX: Call save() to run validation (password hashing removed from User.save())
-        user.save() 
+        # Add to database (no need to call save() separately)
         self.user_repo.add(user)
+        
         return user
 
     def get_user(self, user_id):
+        """Get user by ID"""
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        """Get user by email using UserRepository specific method"""
+        return self.user_repo.get_user_by_email(email)
 
     def get_users_by_ids(self, user_ids):
         """Helper to retrieve a list of user objects by their IDs."""
         return [self.get_user(uid) for uid in user_ids if self.get_user(uid)]
 
     def get_all_user(self):
+        """Get all users"""
         return self.user_repo.get_all()
 
     def update_user(self, user_id, data):
+        """Update user by ID"""
         user = self.user_repo.get(user_id)
         if not user:
             return None
-        for field in ['id', 'email', 'created_at']: # updated_at must be updated by save()
+        
+        # Validate immutable fields
+        for field in ['id', 'created_at']:
             if field in data:
                 raise ValueError(f"Cannot update '{field}'")
-            
-        # Si le mot de passe est dans les données, le hasher avant de mettre à jour
+        
+        # Email can only be updated by admins (handled in API layer)
+        # But we still need to check uniqueness if email is being changed
+        if 'email' in data:
+            existing_user = self.user_repo.get_user_by_email(data['email'])
+            if existing_user and existing_user.id != user_id:
+                raise ValueError("Email already in use")
+        
+        # Hash password if it's being updated
         if 'password' in data:
             user.hash_password(data['password'])
-            del data['password']  # Retirer du dict car déjà traité
-
-        user.update(data) # user.update() calls user.save() internally
+            data.pop('password')  # Remove from dict to avoid double setting
+        
+        # Update user (this will call db.session.commit())
+        user.update(data)
+        
         return user
 
     def delete_user(self, user_id):
@@ -71,13 +84,15 @@ class HBnBFacade:
             return False
 
         # Find and delete all places owned by this user
+        # NOTE: This will be handled by SQLAlchemy cascade when Place is migrated
         places_to_delete = [
             place.id for place in self.place_repo.get_all() 
             if place.owner_id == user_id
         ]
         for place_id in places_to_delete:
-            self.place_repo.delete(place_id) 
+            self.place_repo.delete(place_id)
 
+        # Delete user from database
         self.user_repo.delete(user_id)
         return True
 
