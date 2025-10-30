@@ -1,5 +1,4 @@
 from app.persistence.repository import InMemoryRepository
-from datetime import datetime
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
@@ -25,11 +24,13 @@ class HBnBFacade:
 
         user = User()
         for k, v in user_data.items():
-            setattr(user, k, v)
+            if k == 'password':
+                user.hash_password(v)  # Utilise ta méthode hash_password
+            else:
+                setattr(user, k, v)
         
         # KEY FIX: Call save() to run validation (password hashing removed from User.save())
         user.save() 
-        
         self.user_repo.add(user)
         return user
 
@@ -53,6 +54,12 @@ class HBnBFacade:
         for field in ['id', 'email', 'created_at']: # updated_at must be updated by save()
             if field in data:
                 raise ValueError(f"Cannot update '{field}'")
+            
+        # Si le mot de passe est dans les données, le hasher avant de mettre à jour
+        if 'password' in data:
+            user.hash_password(data['password'])
+            del data['password']  # Retirer du dict car déjà traité
+
         user.update(data) # user.update() calls user.save() internally
         return user
 
@@ -75,12 +82,21 @@ class HBnBFacade:
 
     # --- Amenities ---
     def create_amenity(self, amenity_data):
+        """Create a new amenity with place and owner information"""
         name = amenity_data.get("name")
+        place_id = amenity_data.get("place_id")
+        owner_id = amenity_data.get("owner_id")
+        
         if not name:
             raise ValueError("Amenity name is required")
         
-        # Pass kwargs to constructor for proper BaseModel initialization
-        amenity = Amenity(name=name) 
+        if not place_id:
+            raise ValueError("place_id is required")
+        
+        if not owner_id:
+            raise ValueError("owner_id is required")
+        
+        amenity = Amenity(name=name, place_id=place_id, owner_id=owner_id)
         amenity.validate()
         self.amenity_repo.add(amenity)
         return amenity
@@ -241,6 +257,22 @@ class HBnBFacade:
              return []
 
         return [r for r in self.review_repo.get_all() if getattr(r, 'place_id', None) == place_id]
+
+    def user_has_reviewed_place(self, user_id, place_id):
+        """Check if a user has already reviewed a specific place
+        
+        Args:
+            user_id (str): The user's unique identifier
+            place_id (str): The place's unique identifier
+            
+        Returns:
+            bool: True if user has already reviewed this place, False otherwise
+        """
+        reviews = self.get_reviews_by_place(place_id)
+        for review in reviews:
+            if review.user_id == user_id:
+                return True
+        return False
 
     def update_review(self, review_id, review_data):
         """

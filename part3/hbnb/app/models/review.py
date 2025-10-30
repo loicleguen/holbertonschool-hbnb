@@ -35,11 +35,11 @@ class Review(BaseModel):
         user_id = review_dict.pop('user_id', None)
         if user_id and users_map and user_id in users_map:
             user_obj = users_map[user_id]
-            review_dict['user'] = user_obj.to_dict(safe=True) 
+            review_dict['user'] = user_obj.to_dict() 
 
         place_id = review_dict.pop('place_id', None)
         if place_id and places_map and place_id in places_map:
             place_obj = places_map[place_id]
-            review_dict['place'] = place_obj.to_dict(safe=True)
+            review_dict['place'] = place_obj.to_dict()
 
         return review_dict
