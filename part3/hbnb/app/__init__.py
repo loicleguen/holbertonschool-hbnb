@@ -7,10 +7,12 @@ from flask_restx import Api
 from config import DevelopmentConfig
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 jwt = JWTManager()
 facade = HBnBFacade()
 bcrypt = Bcrypt()
+db = SQLAlchemy()
 
 
 def create_app(config_class=DevelopmentConfig):
@@ -18,6 +20,8 @@ def create_app(config_class=DevelopmentConfig):
     app.config.from_object(config_class)
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
+
 
     # Configure JWT authorization in Swagger
     authorizations = {
