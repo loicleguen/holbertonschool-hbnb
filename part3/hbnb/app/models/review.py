@@ -1,45 +1,40 @@
-from .BaseModel import BaseModel
+#!/usr/bin/env python3
+"""
+SQLAlchemy model for the Review entity.
+No relationships included yet, as per task instructions.
+"""
+from sqlalchemy import Column, String, Integer
+from hbnb.app.models.BaseModel import db, BaseModel
+from datetime import datetime
+import uuid
 
 class Review(BaseModel):
-    def __init__(self, place_id=None, user_id=None, text=None, rating=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.place_id = self.__dict__.get('place_id', place_id) 
-        self.user_id = self.__dict__.get('user_id', user_id) 
-        self.text = self.__dict__.get('text', text)
-        self.rating = self.__dict__.get('rating', rating)
+    """
+    Review model that inherits from BaseModel and maps to the 'reviews' table.
+    Includes core attributes as required by Task 07.
+    """
+    __tablename__ = 'reviews'
 
-    def validate(self):
-        if not hasattr(self, 'text') or not isinstance(self.text, str) or len(self.text) < 1:
-            raise ValueError("text must be a non-empty string")
-        
+    # Core attributes as required by Task 07
+    # Note: id, created_at, updated_at are inherited from BaseModel
+    text = Column(String(1024), nullable=False)
+    rating = Column(Integer, nullable=False) # Expected range 1-5, but no constraint added yet
 
-        if not hasattr(self, 'rating') or not isinstance(self.rating, (int, float)):
-            raise TypeError("rating must be a number (integer or float)")
+    def __init__(self, text, rating, **kwargs):
+        """Initializes a new Review instance."""
+        super().__init__(**kwargs)
+        self.text = text
+        self.rating = rating
 
+    def __repr__(self):
+        return f"<Review id='{self.id}' rating='{self.rating}'>"
 
-        if not 1 <= self.rating <= 5:
-            raise ValueError("rating must be between 1 and 5 ")
-
-        if not hasattr(self, 'place_id') or not isinstance(self.place_id, str) or not self.place_id:
-            raise ValueError("place_id must be a non-empty string ID")
-        if not hasattr(self, 'user_id') or not isinstance(self.user_id, str) or not self.user_id: 
-            raise TypeError("user_id must be a non-empty string ID")
-        return True
-
-    def to_dict(self, users_map=None, places_map=None, **kwargs):
-        """
-        Returns a dictionary representation of the Review, including nested 'user' and 'place' objects if maps are provided.
-        """
-        review_dict = super().to_dict(**kwargs) 
-
-        user_id = review_dict.pop('user_id', None)
-        if user_id and users_map and user_id in users_map:
-            user_obj = users_map[user_id]
-            review_dict['user'] = user_obj.to_dict() 
-
-        place_id = review_dict.pop('place_id', None)
-        if place_id and places_map and place_id in places_map:
-            place_obj = places_map[place_id]
-            review_dict['place'] = place_obj.to_dict()
-
-        return review_dict
+    def to_dict(self):
+        """Returns a dictionary representation of the Review."""
+        return {
+            'id': self.id,
+            'text': self.text,
+            'rating': self.rating,
+            'created_at': self.created_at.isoformat() if isinstance(self.created_at, datetime) else self.created_at,
+            'updated_at': self.updated_at.isoformat() if isinstance(self.updated_at, datetime) else self.updated_at,
+        }

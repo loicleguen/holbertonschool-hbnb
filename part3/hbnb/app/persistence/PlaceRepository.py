@@ -1,22 +1,18 @@
-from app import db
-from app.models.BaseModel import BaseModel 
+#!/usr/bin/env python3
+"""
+Repository for Place entity, inheriting from the base Repository.
+"""
+from hbnb.app.persistence.repository import Repository
+from hbnb.app.models.place import Place
 
-class Place(BaseModel):
+class PlaceRepository(Repository):
     """
-    Represents a place (rental listing), mapped to the 'places' table.
-    Inherits id, created_at, and updated_at (UUID, timestamps) from BaseModel.
+    Handles persistence operations for the Place model.
+    Inherits generic CRUD from the base Repository class.
     """
-    __tablename__ = 'places'
+    def __init__(self):
+        """Initializes with the Place model."""
+        super().__init__(Place)
 
-    # Core Attributes (as per task instructions)
-    title = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.Text, nullable=True) 
-    price = db.Column(db.Float, nullable=False)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    
-    # Note: owner_id, city_id, and amenity relationships will be added in later tasks.
-
-    def __repr__(self):
-        """Returns a string representation of the object."""
-        return f"<Place {self.id} - {self.title}>"
+# Note: All basic CRUD methods (save, get, get_all, update, delete) 
+# are assumed to be implemented in the base Repository class (repository.py).

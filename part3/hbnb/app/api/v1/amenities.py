@@ -157,3 +157,4 @@ class AmenityResource(Resource):
         if facade_instance.delete_amenity(amenity_id):
             return {}, 204
         amenities_ns.abort(404, 'Amenity not found')
+    

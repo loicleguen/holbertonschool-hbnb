@@ -1,19 +1,18 @@
-from app import db
-from app.models.BaseModel import BaseModel 
+#!/usr/bin/env python3
+"""
+Repository for Review entity, inheriting from the base Repository.
+"""
+from hbnb.app.persistence.repository import Repository
+from hbnb.app.models.review import Review
 
-class Review(BaseModel):
+class ReviewRepository(Repository):
     """
-    Represents a review for a place, mapped to the 'reviews' table.
-    Inherits id, created_at, and updated_at (UUID, timestamps) from BaseModel.
+    Handles persistence operations for the Review model.
+    Inherits generic CRUD from the base Repository class.
     """
-    __tablename__ = 'reviews'
+    def __init__(self):
+        """Initializes with the Review model."""
+        super().__init__(Review)
 
-    # Core Attributes (as per task instructions)
-    text = db.Column(db.Text, nullable=False)
-    rating = db.Column(db.Integer, nullable=False) # Rating from 1 to 5
-    
-    # Note: user_id and place_id relationships will be added in later tasks.
-
-    def __repr__(self):
-        """Returns a string representation of the object."""
-        return f"<Review {self.id} - Rating: {self.rating}>"
+# Note: All basic CRUD methods (save, get, get_all, update, delete) 
+# are assumed to be implemented in the base Repository class (repository.py).

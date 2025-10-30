@@ -1,16 +1,18 @@
-from app import db
-from app.models.BaseModel import BaseModel 
+#!/usr/bin/env python3
+"""
+Repository for Amenity entity, inheriting from the base Repository.
+"""
+from hbnb.app.persistence.repository import Repository
+from hbnb.app.models.amenity import Amenity
 
-class Amenity(BaseModel):
+class AmenityRepository(Repository):
     """
-    Represents an amenity, mapped to the 'amenities' table.
-    Inherits id, created_at, and updated_at (UUID, timestamps) from BaseModel.
+    Handles persistence operations for the Amenity model.
+    Inherits generic CRUD from the base Repository class.
     """
-    __tablename__ = 'amenities'
+    def __init__(self):
+        """Initializes with the Amenity model."""
+        super().__init__(Amenity)
 
-    # Core Attribute (as per task instructions)
-    name = db.Column(db.String(80), nullable=False, unique=True)
-
-    def __repr__(self):
-        """Returns a string representation of the object."""
-        return f"<Amenity {self.id} - {self.name}>"
+# Note: All basic CRUD methods (save, get, get_all, update, delete) 
+# are assumed to be implemented in the base Repository class (repository.py).
