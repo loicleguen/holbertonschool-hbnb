@@ -1,23 +1,35 @@
 #!/usr/bin/python3
 """Initialize Flask app and register namespaces"""
 
-from app.services.facade import HBnBFacade
 from flask import Flask
 from flask_restx import Api
-from config import DevelopmentConfig
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy  # ← AJOUTER
+from config import DevelopmentConfig
 
-jwt = JWTManager()
-facade = HBnBFacade()
+# Initialize extensions
 bcrypt = Bcrypt()
+jwt = JWTManager()
+db = SQLAlchemy()  # ← AJOUTER
+
+# Facade will be imported after db is initialized to avoid circular imports
+facade = None
 
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    
+    # Initialize extensions
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)  # ← AJOUTER
+    
+    # Initialize facade after app context is created
+    global facade
+    from app.services.facade import HBnBFacade
+    facade = HBnBFacade()
 
     # Configure JWT authorization in Swagger
     authorizations = {
@@ -36,8 +48,8 @@ def create_app(config_class=DevelopmentConfig):
         title='HBnB API',
         description='A simple API for HBnB by Loic & Val',
         doc='/',
-        authorizations=authorizations,  # Add JWT configuration
-        security='Bearer'  # Apply globally (can be overridden per endpoint)
+        authorizations=authorizations,
+        security='Bearer'
     )
 
     # Import each namespace directly from its file
