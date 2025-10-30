@@ -28,6 +28,8 @@ user_response_model = users_ns.model('UserResponse', {
 user_update_model = users_ns.model('UserUpdateInput', {
     'first_name': fields.String(required=False, description='First name of the user'),
     'last_name': fields.String(required=False, description='Last name of the user'),
+    'email': fields.String(required=True, is_admin=True, description='Email of the user'),
+    'password': fields.String(required=True, is_admin=True, description='Password of the user'),
 })
 
 
