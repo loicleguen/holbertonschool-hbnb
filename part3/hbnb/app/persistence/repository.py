@@ -1,61 +1,76 @@
-#!/usr/bin/python3
-"""Repository pattern with InMemoryRepository"""
-
-from abc import ABC, abstractmethod
 from app import db
+from app.models.user import User
 
-class Repository(ABC):
-    @abstractmethod
-    def add(self, obj):
-        pass
+class BaseRepository:
+    """Base abstract class for repositories, defining the contract."""
+    def get_all(self): raise NotImplementedError
+    def get(self, entity_id): raise NotImplementedError
+    def add(self, entity): raise NotImplementedError
+    def update(self, entity, data): raise NotImplementedError
+    def delete(self, entity): raise NotImplementedError
 
-    @abstractmethod
-    def get(self, obj_id):
-        pass
-
-    @abstractmethod
-    def get_all(self):
-        pass
-
-    @abstractmethod
-    def update(self, obj_id, data):
-        pass
-
-    @abstractmethod
-    def delete(self, obj_id):
-        pass
-
-    @abstractmethod
-    def get_by_attribute(self, attr_name, attr_value):
-        pass
-
-
-class SQLAlchemyRepository(Repository):
+class SQLAlchemyRepository(BaseRepository):
+    """
+    Generic repository implementation using SQLAlchemy ORM.
+    Handles basic CRUD operations using db.session.
+    """
     def __init__(self, model):
         self.model = model
 
-    def add(self, obj):
-        db.session.add(obj)
-        db.session.commit()
-
-    def get(self, obj_id):
-        return self.model.query.get(obj_id)
-
     def get_all(self):
+        """Returns all instances of the model."""
         return self.model.query.all()
 
-    def update(self, obj_id, data):
-        obj = self.get(obj_id)
-        if obj:
-            for key, value in data.items():
-                setattr(obj, key, value)
-            db.session.commit()
+    def get(self, entity_id):
+        """Returns a single instance by its ID."""
+        return self.model.query.get(entity_id)
 
-    def delete(self, obj_id):
-        obj = self.get(obj_id)
-        if obj:
-            db.session.delete(obj)
-            db.session.commit()
+    def add(self, entity):
+        """Adds a new entity to the database session and commits."""
+        db.session.add(entity)
+        db.session.commit()
+        return entity
 
-    def get_by_attribute(self, attr_name, attr_value):
-        return self.model.query.filter(getattr(self.model, attr_name) == attr_value).first()
+    def update(self, entity, data):
+        """
+        Updates an existing entity with new data and commits.
+        NOTE: 'entity' must be a retrieved SQLAlchemy object.
+        """
+        for key, value in data.items():
+            if key in ('id', 'created_at', 'updated_at') or (key == 'password' and not value):
+                continue
+            
+            if hasattr(entity, key):
+                if key == 'password':
+                    entity.hash_password(value)
+                else:
+                    setattr(entity, key, value)
+
+        db.session.commit()
+        return entity
+
+    def delete(self, entity):
+        """Deletes an entity from the database session and commits."""
+        db.session.delete(entity)
+        db.session.commit()
+        return True
+
+    def delete_by_id(self, entity_id):
+        """Deletes an entity by its ID."""
+        entity = self.get(entity_id)
+        if entity:
+            return self.delete(entity)
+        return False
+
+
+class UserRepository(SQLAlchemyRepository):
+    """
+    Specific repository for User-related database operations.
+    Extends generic SQLAlchemyRepository with domain-specific queries.
+    """
+    def __init__(self):
+        super().__init__(User)
+
+    def get_user_by_email(self, email):
+        """Retrieves a user instance by their email address."""
+        return self.model.query.filter_by(email=email).first()

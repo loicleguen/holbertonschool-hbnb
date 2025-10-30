@@ -2,7 +2,7 @@
 """Defines the BaseModel class with SQLAlchemy support"""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 
 
@@ -13,8 +13,10 @@ class BaseModel(db.Model):
     
     # SQLAlchemy columns
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, 
+                           default=lambda: datetime.now(timezone.utc), 
+                           onupdate=lambda: datetime.now(timezone.utc))
 
     def __init__(self, *args, **kwargs):
         """
@@ -31,9 +33,9 @@ class BaseModel(db.Model):
         if not hasattr(self, 'updated_at') or self.updated_at is None:
             self.updated_at = datetime.utcnow()
 
-    def __str__(self):
-        """Returns the string representation of the object"""
-        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
+    def __repr__(self):
+        """Returns a string representation of the object."""
+        return f"<{self.__class__.__name__} {self.id}>"
 
     def save(self):
         """Save the current instance to the database"""
@@ -56,21 +58,19 @@ class BaseModel(db.Model):
         self.updated_at = datetime.utcnow()
         db.session.commit()
 
-    def to_dict(self, **kwargs):
-        """Returns a dictionary representation of the instance"""
+    def to_dict(self, include_relationships=False):
+        """Returns a dictionary representation of the instance for JSON serialization."""
         data = {}
         
-        # Get all columns from SQLAlchemy table
         for column in self.__table__.columns:
-            value = getattr(self, column.name)
+            key = column.name
+            value = getattr(self, key)
             
-            # Convert datetime to ISO format
             if isinstance(value, datetime):
-                data[column.name] = value.isoformat()
+                data[key] = value.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z')
             else:
-                data[column.name] = value
-        
-        # Add class name for compatibility
+                data[key] = value
+            
         data['__class__'] = self.__class__.__name__
         
         return data
