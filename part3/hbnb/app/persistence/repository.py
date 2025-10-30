@@ -1,5 +1,8 @@
 from app import db
 from app.models.user import User
+from app.models.place import Place
+from app.models.review import Review
+from app.models.amenity import Amenity
 
 class BaseRepository:
     """Base abstract class for repositories, defining the contract."""
@@ -41,7 +44,7 @@ class SQLAlchemyRepository(BaseRepository):
                 continue
             
             if hasattr(entity, key):
-                if key == 'password':
+                if key == 'password' and isinstance(entity, User):
                     entity.hash_password(value)
                 else:
                     setattr(entity, key, value)
@@ -63,6 +66,8 @@ class SQLAlchemyRepository(BaseRepository):
         return False
 
 
+# --- Entity Specific Repositories ---
+
 class UserRepository(SQLAlchemyRepository):
     """
     Specific repository for User-related database operations.
@@ -74,3 +79,18 @@ class UserRepository(SQLAlchemyRepository):
     def get_user_by_email(self, email):
         """Retrieves a user instance by their email address."""
         return self.model.query.filter_by(email=email).first()
+        
+class PlaceRepository(SQLAlchemyRepository):
+    """Specific repository for Place-related database operations."""
+    def __init__(self):
+        super().__init__(Place)
+
+class ReviewRepository(SQLAlchemyRepository):
+    """Specific repository for Review-related database operations."""
+    def __init__(self):
+        super().__init__(Review)
+
+class AmenityRepository(SQLAlchemyRepository):
+    """Specific repository for Amenity-related database operations."""
+    def __init__(self):
+        super().__init__(Amenity)
