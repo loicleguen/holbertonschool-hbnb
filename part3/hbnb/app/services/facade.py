@@ -6,9 +6,9 @@ from app.persistence.amenity_repository import AmenityRepository
 from app.persistence.place_repository import PlaceRepository
 from app.persistence.review_repository import ReviewRepository
 from app.models.user import User
-from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
+from app.models.amenity import Amenity
 
 
 class HBnBFacade:
@@ -36,20 +36,23 @@ class HBnBFacade:
         return user
 
     def get_user(self, user_id):
+        """Retrieves a single User by ID."""
         return self.user_repo.get(user_id)
-
+    
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
 
     def get_users_by_ids(self, user_ids):
         return [self.get_user(uid) for uid in user_ids if self.get_user(uid)]
 
-    def get_all_user(self):
+    def get_all_users(self):
+        """Retrieves all Users."""
         return self.user_repo.get_all()
 
     def update_user(self, user_id, data):
+        """Updates an existing User."""
         user = self.user_repo.get(user_id)
-        if not user:
+        if user is None:
             return None
         
         for field in ['id', 'created_at']:
@@ -170,14 +173,17 @@ class HBnBFacade:
         return place
 
     def get_place(self, place_id):
+        """Retrieves a single Place by ID."""
         return self.place_repo.get(place_id)
 
     def get_all_places(self):
+        """Retrieves all Places."""
         return self.place_repo.get_all()
 
-    def update_place(self, place_id, place_data):
+    def update_place(self, place_id, data):
+        """Updates an existing Place."""
         place = self.place_repo.get(place_id)
-        if not place:
+        if place is None:
             return None
         
         for field in ['id', 'owner_id', 'created_at']:

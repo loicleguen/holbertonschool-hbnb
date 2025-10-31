@@ -3,7 +3,8 @@
 
 from app import db
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+from app import db
 
 
 class BaseModel(db.Model):
