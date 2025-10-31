@@ -10,13 +10,18 @@ from email_validator import validate_email, EmailNotValidError
 class User(BaseModel):
     """User model mapped to database table"""
     
-    __tablename__ = 'users'
+    __tablename__ = 'users'  # ✅ OBLIGATOIRE
     
+    # SQLAlchemy columns
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True) 
-    password = db.Column(db.String(128), nullable=False) 
-    is_admin = db.Column(db.Boolean, default=False)
+    email = db.Column(db.String(120), nullable=False, unique=True, index=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    
+    # Relationships
+    places = db.relationship('Place', back_populates='owner', lazy=True, cascade='all, delete-orphan')
+    reviews = db.relationship('Review', backref='user', lazy=True, cascade='all, delete-orphan')
 
     def __init__(self, first_name=None, last_name=None, email=None, password=None, is_admin=False, **kwargs):
         """Initialize User instance"""
@@ -30,20 +35,22 @@ class User(BaseModel):
             self.email = email
         if is_admin is not None:
             self.is_admin = is_admin
+        
+        # Hash password if provided
         if password:
             self.hash_password(password)
 
     def hash_password(self, password):
-        """Hashes the plaintext password using bcrypt and stores it."""
-        if password:
-            self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        """Hash the password before storing it"""
+        if not password or len(password) < 6:
+            raise ValueError("Password must be at least 6 characters long")
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
-        """Verifies if the provided plaintext password matches the stored hashed password."""
-        if self.password is None:
-            return False
+        """Verify the hashed password"""
         return bcrypt.check_password_hash(self.password, password)
 
+    # SQLAlchemy validators
     @validates('first_name')
     def validate_first_name(self, key, value):
         """Validate first_name"""
@@ -74,14 +81,13 @@ class User(BaseModel):
         except EmailNotValidError as e:
             raise ValueError(f"Invalid email: {str(e)}")
 
-    def __repr__(self):
-        return f"<User {self.email}>"
-
-    def to_dict(self, include_relationships=False):
-        """Returns a dictionary representation of the user, excluding the password hash."""
-        data = super().to_dict(include_relationships)
-        
-        if 'password' in data:
-            del data['password']
-            
+    def to_dict(self, **kwargs):
+        """Return dictionary representation without password"""
+        data = super().to_dict(**kwargs)
+        # Never expose password in API responses
+        data.pop('password', None)
         return data
+
+    def __repr__(self):
+        """String representation of User"""
+        return f"<User {self.email}>"
