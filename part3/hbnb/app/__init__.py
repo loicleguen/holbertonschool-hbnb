@@ -1,17 +1,17 @@
 #!/usr/bin/python3
 """Initialize Flask app and register namespaces"""
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy  # ← AJOUTER
+from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig
 
 # Initialize extensions
 bcrypt = Bcrypt()
 jwt = JWTManager()
-db = SQLAlchemy()  # ← AJOUTER
+db = SQLAlchemy()
 
 # Facade will be imported after db is initialized to avoid circular imports
 facade = None
@@ -24,14 +24,52 @@ def create_app(config_class=DevelopmentConfig):
     # Initialize extensions
     bcrypt.init_app(app)
     jwt.init_app(app)
-    db.init_app(app)  # ← AJOUTER
+    db.init_app(app)
     
     # Initialize facade after app context is created
     global facade
     from app.services.facade import HBnBFacade
     facade = HBnBFacade()
 
+    # ========================================
+    # JWT ERROR HANDLERS (GLOBAL)
+    # ========================================
+    
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        """Handle expired JWT tokens"""
+        return jsonify({
+            'error': 'Expired token',
+            'message': 'The token has expired. Please login again.'
+        }), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        """Handle invalid JWT tokens"""
+        return jsonify({
+            'error': 'Invalid token',
+            'message': 'Signature verification failed or token is malformed.'
+        }), 401
+
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        """Handle missing JWT tokens"""
+        return jsonify({
+            'error': 'Missing Authorization Header',
+            'message': 'Request does not contain a valid access token.'
+        }), 401
+
+    @jwt.revoked_token_loader
+    def revoked_token_callback(jwt_header, jwt_payload):
+        """Handle revoked JWT tokens"""
+        return jsonify({
+            'error': 'Revoked token',
+            'message': 'The token has been revoked.'
+        }), 401
+
+    # ========================================
     # Configure JWT authorization in Swagger
+    # ========================================
     authorizations = {
         'Bearer': {
             'type': 'apiKey',
