@@ -5,6 +5,8 @@ from flask import Flask, jsonify
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_jwt_extended.exceptions import NoAuthorizationError
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig
 
@@ -32,36 +34,36 @@ def create_app(config_class=DevelopmentConfig):
     facade = HBnBFacade()
 
     # ========================================
-    # JWT ERROR HANDLERS (GLOBAL)
+    # JWT ERROR HANDLERS (Flask-JWT-Extended)
     # ========================================
     
     @jwt.expired_token_loader
-    def expired_token_callback(jwt_header, jwt_payload):
-        """Handle expired JWT tokens"""
+    def expired_token_callback(_jwt_header, _jwt_payload):
+        """Handle expired JWT tokens (Flask-JWT-Extended)"""
         return jsonify({
             'error': 'Expired token',
             'message': 'The token has expired. Please login again.'
         }), 401
 
     @jwt.invalid_token_loader
-    def invalid_token_callback(error):
-        """Handle invalid JWT tokens"""
+    def invalid_token_callback(_error):
+        """Handle invalid JWT tokens (Flask-JWT-Extended)"""
         return jsonify({
             'error': 'Invalid token',
             'message': 'Signature verification failed or token is malformed.'
         }), 401
 
     @jwt.unauthorized_loader
-    def missing_token_callback(error):
-        """Handle missing JWT tokens"""
+    def missing_token_callback(_error):
+        """Handle missing JWT tokens (Flask-JWT-Extended)"""
         return jsonify({
             'error': 'Missing Authorization Header',
             'message': 'Request does not contain a valid access token.'
         }), 401
 
     @jwt.revoked_token_loader
-    def revoked_token_callback(jwt_header, jwt_payload):
-        """Handle revoked JWT tokens"""
+    def revoked_token_callback(_jwt_header, _jwt_payload):
+        """Handle revoked JWT tokens (Flask-JWT-Extended)"""
         return jsonify({
             'error': 'Revoked token',
             'message': 'The token has been revoked.'
@@ -89,6 +91,34 @@ def create_app(config_class=DevelopmentConfig):
         authorizations=authorizations,
         security='Bearer'
     )
+
+    # ========================================
+    # GLOBAL ERROR HANDLERS (Flask + Flask-RESTX)
+    # ========================================
+    
+    @api.errorhandler(ExpiredSignatureError)
+    def handle_expired_signature(_error):
+        """Handle expired JWT tokens (PyJWT library)"""
+        return {
+            'error': 'Expired token',
+            'message': 'The token has expired. Please login again.'
+        }, 401
+
+    @api.errorhandler(InvalidTokenError)
+    def handle_invalid_token(_error):
+        """Handle invalid JWT tokens (PyJWT library)"""
+        return {
+            'error': 'Invalid token',
+            'message': 'Signature verification failed or token is malformed.'
+        }, 401
+
+    @api.errorhandler(NoAuthorizationError)
+    def handle_no_authorization(_error):
+        """Handle missing authorization header"""
+        return {
+            'error': 'Missing Authorization Header',
+            'message': 'Request does not contain a valid access token.'
+        }, 401
 
     # Import each namespace directly from its file
     from .api.v1.users import users_ns
