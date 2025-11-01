@@ -28,8 +28,8 @@ user_response_model = users_ns.model('UserResponse', {
 user_update_model = users_ns.model('UserUpdateInput', {
     'first_name': fields.String(required=False, description='First name of the user'),
     'last_name': fields.String(required=False, description='Last name of the user'),
-    'email': fields.String(required=True, is_admin=True, description='Email of the user'),
-    'password': fields.String(required=True, is_admin=True, description='Password of the user'),
+    'email': fields.String(required=False, description='Email of the user (admin only)'),
+    'password': fields.String(required=False, description='Password of the user (admin only)'),
 })
 
 
@@ -80,7 +80,7 @@ class UserResource(Resource):
             users_ns.abort(404, 'User not found')
         return user.to_dict()
 
-    @jwt_required()  # Protected: Users can update their profile, admins can update any user
+    @jwt_required()
     @users_ns.expect(user_update_model, validate=True)
     @users_ns.marshal_with(user_response_model) 
     @users_ns.response(200, 'User successfully updated')
@@ -88,7 +88,7 @@ class UserResource(Resource):
     @users_ns.response(403, 'Unauthorized action')
     @users_ns.response(404, 'User not found')
     def put(self, user_id):
-        """Update an existing user by ID (Protected - users can update their profile, admins can update any user)"""
+        """Update user profile (users can update first_name/last_name, admins can update everything)"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
@@ -101,10 +101,8 @@ class UserResource(Resource):
 
         # For non-admin users, block email and password changes
         if not is_admin:
-            if 'email' in data:
-                users_ns.abort(403, 'You cannot change your email address')
-            if 'password' in data:
-                users_ns.abort(403, 'Password cannot be changed via this endpoint. Use /auth/change-password instead')
+            if 'email' in data or 'password' in data:
+                users_ns.abort(403, 'You cannot change your email address or your password !')
 
         # For admin users, check email uniqueness if email is being changed
         if is_admin and 'email' in data:
@@ -122,12 +120,12 @@ class UserResource(Resource):
 
         return updated_user.to_dict()
 
-    @jwt_required()  # Protected: Admin only
+    @jwt_required()
     @users_ns.response(200, 'User successfully deleted')
     @users_ns.response(403, 'Admin privileges required')
     @users_ns.response(404, 'User not found')
     def delete(self, user_id):
-        """Delete a user by ID (Protected - admin only)"""
+        """Delete a user by ID (admin only)"""
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
         
