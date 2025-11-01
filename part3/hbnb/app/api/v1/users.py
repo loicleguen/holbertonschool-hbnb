@@ -101,8 +101,9 @@ class UserResource(Resource):
 
         # For non-admin users, block email and password changes
         if not is_admin:
+            # Check if user is trying to change forbidden fields
             if 'email' in data or 'password' in data:
-                users_ns.abort(403, 'You cannot change your email address or your password !')
+                users_ns.abort(403, 'You cannot change your email address or your password!')
 
         # For admin users, check email uniqueness if email is being changed
         if is_admin and 'email' in data:
