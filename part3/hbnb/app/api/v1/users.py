@@ -24,12 +24,12 @@ user_response_model = users_ns.model('UserResponse', {
     'updated_at': fields.String(description='The timestamp of last update')
 })
 
-# Model for user update (PUT)
+# Model for user update (PUT) - Les 4 champs sont OBLIGATOIRES
 user_update_model = users_ns.model('UserUpdateInput', {
-    'first_name': fields.String(required=False, description='First name of the user'),
-    'last_name': fields.String(required=False, description='Last name of the user'),
-    'email': fields.String(required=False, description='Email of the user (admin only)'),
-    'password': fields.String(required=False, description='Password of the user (admin only)'),
+    'first_name': fields.String(required=True, description='First name of the user'),
+    'last_name': fields.String(required=True, description='Last name of the user'),
+    'email': fields.String(required=True, description='Current email (for verification)'),
+    'password': fields.String(required=True, description='Current password (for verification)'),
 })
 
 
@@ -85,10 +85,11 @@ class UserResource(Resource):
     @users_ns.marshal_with(user_response_model) 
     @users_ns.response(200, 'User successfully updated')
     @users_ns.response(400, 'Invalid input data')
+    @users_ns.response(401, 'Invalid email or password')
     @users_ns.response(403, 'Unauthorized action')
     @users_ns.response(404, 'User not found')
     def put(self, user_id):
-        """Update user profile (users can update first_name/last_name, admins can update everything)"""
+        """Update user profile (requires email and password verification)"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
@@ -98,21 +99,24 @@ class UserResource(Resource):
             users_ns.abort(403, 'Unauthorized action')
         
         data = users_ns.payload
-
-        # For non-admin users, block email and password changes
-        if not is_admin:
-            # Check if user is trying to change forbidden fields
-            if 'email' in data or 'password' in data:
-                users_ns.abort(403, 'You cannot change your email address or your password!')
-
-        # For admin users, check email uniqueness if email is being changed
-        if is_admin and 'email' in data:
-            existing_user = facade_instance.get_user_by_email(data['email'])
-            if existing_user and existing_user.id != user_id:
-                users_ns.abort(400, 'Email already in use')
+        
+        # Get the user to verify credentials
+        user = facade_instance.get_user(user_id)
+        if not user:
+            users_ns.abort(404, 'User not found')
+        
+        # Verify email and password
+        if user.email != data.get('email') or not user.verify_password(data.get('password', '')):
+            users_ns.abort(401, 'You can change only firs_name or last_name')
+        
+        # Prepare update data (only first_name and last_name for non-admin)
+        update_data = {
+            'first_name': data['first_name'],
+            'last_name': data['last_name']
+        }
 
         try:
-            updated_user = facade_instance.update_user(user_id, data)
+            updated_user = facade_instance.update_user(user_id, update_data)
         except ValueError as e:
             users_ns.abort(400, str(e))
 
