@@ -8,8 +8,8 @@ from sqlalchemy.orm import validates
 
 # Association table for Many-to-Many relationship between Place and Amenity
 place_amenity = db.Table('place_amenity',
-    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
-    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id', ondelete='CASCADE'), primary_key=True)
 )
 
 
@@ -26,7 +26,7 @@ class Place(BaseModel):
     longitude = db.Column(db.Float, nullable=False)
     
     # Foreign key (One-to-Many relationship with User)
-    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
     
     # Relationships
     owner = db.relationship('User', back_populates='places')
