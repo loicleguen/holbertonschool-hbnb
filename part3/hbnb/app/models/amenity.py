@@ -12,23 +12,17 @@ class Amenity(BaseModel):
     __tablename__ = 'amenities'
     
     # SQLAlchemy columns
-    name = db.Column(db.String(50), nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False, unique=True)
     
     # Many-to-Many relationship with Place (will be activated after Place model)
     places = db.relationship('Place', secondary='place_amenity', back_populates='amenities', lazy='subquery')
 
     def __init__(self, name=None, place_id=None, owner_id=None, **kwargs):
-        """
-        Initialize Amenity instance
-        
-        Note: place_id and owner_id are accepted for API compatibility
-        but will be managed via Place-Amenity relationship (many-to-many)
-        """
+        """Initialize Amenity instance"""
         super().__init__(**kwargs)
         if name:
             self.name = name
         
-        # Store temporarily for business logic validation (not persisted in amenities table)
         self._temp_place_id = place_id
         self._temp_owner_id = owner_id
 
@@ -37,15 +31,14 @@ class Amenity(BaseModel):
         """Validate amenity name"""
         if not value or not isinstance(value, str) or not value.strip():
             raise ValueError("Amenity name must be a non-empty string")
-        if len(value) > 50:
-            raise ValueError("Amenity name must be less than 50 characters")
+        if len(value) > 255:
+            raise ValueError("Amenity name must be less than 255 characters")
         return value.strip()
 
     def to_dict(self, **kwargs):
         """Return dictionary representation of the amenity"""
         data = super().to_dict(**kwargs)
         
-        # Add temp IDs if they exist (for API backward compatibility)
         if hasattr(self, '_temp_place_id') and self._temp_place_id:
             data['place_id'] = self._temp_place_id
         if hasattr(self, '_temp_owner_id') and self._temp_owner_id:

@@ -13,10 +13,10 @@ class User(BaseModel):
     __tablename__ = 'users'  # ✅ OBLIGATOIRE
     
     # SQLAlchemy columns
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True, index=True)
-    password = db.Column(db.String(128), nullable=False)
+    first_name = db.Column(db.String(255), nullable=False)
+    last_name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    password = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     # Relationships
@@ -56,8 +56,8 @@ class User(BaseModel):
         """Validate first_name"""
         if not value or not isinstance(value, str) or not value.strip():
             raise ValueError("first_name must be a non-empty string")
-        if len(value) > 50:
-            raise ValueError("first_name must be less than 50 characters")
+        if len(value) > 255:
+            raise ValueError("first_name must be less than 255 characters")
         return value.strip()
 
     @validates('last_name')
@@ -65,8 +65,8 @@ class User(BaseModel):
         """Validate last_name"""
         if not value or not isinstance(value, str) or not value.strip():
             raise ValueError("last_name must be a non-empty string")
-        if len(value) > 50:
-            raise ValueError("last_name must be less than 50 characters")
+        if len(value) > 255:
+            raise ValueError("last_name must be less than 255 characters")
         return value.strip()
 
     @validates('email')

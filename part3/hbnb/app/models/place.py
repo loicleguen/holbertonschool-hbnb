@@ -4,6 +4,7 @@
 from app import db
 from app.models.BaseModel import BaseModel
 from sqlalchemy.orm import validates
+from decimal import Decimal
 
 
 # Association table for Many-to-Many relationship between Place and Amenity
@@ -19,9 +20,9 @@ class Place(BaseModel):
     __tablename__ = 'places'
     
     # SQLAlchemy columns
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     
@@ -58,18 +59,26 @@ class Place(BaseModel):
         """Validate title"""
         if not value or not isinstance(value, str) or not value.strip():
             raise ValueError("title must be a non-empty string")
-        if len(value) > 100:
-            raise ValueError("title must be less than 100 characters")
+        if len(value) > 255:
+            raise ValueError("title must be less than 255 characters")
         return value.strip()
 
     @validates('price')
     def validate_price(self, key, value):
         """Validate price"""
-        if value is None or not isinstance(value, (int, float)):
+        if value is None:
+            raise ValueError("Price is required")
+        
+        # Convert to Decimal for precision
+        try:
+            decimal_value = Decimal(str(value))
+        except:
             raise TypeError("Price must be a number")
-        if value < 0:
+        
+        if decimal_value < 0:
             raise ValueError("Price must be non-negative")
-        return float(value)
+        
+        return decimal_value
 
     @validates('latitude')
     def validate_latitude(self, key, value):
@@ -96,12 +105,13 @@ class Place(BaseModel):
 
     def to_dict(self, owners_map=None, amenities_map=None, reviews_map=None, **kwargs):
         """
-        Returns a dictionary representation of the Place, including:
-        - owner (full user info)
-        - amenities (id + name)
-        - reviews (id + text + rating)
+        Returns a dictionary representation of the Place
         """
         place_dict = super().to_dict(**kwargs)
+        
+        # Convert Decimal to float for JSON serialization
+        if 'price' in place_dict and isinstance(place_dict['price'], Decimal):
+            place_dict['price'] = float(place_dict['price'])
 
         # ----- OWNER -----
         owner_id = place_dict.get('owner_id')
