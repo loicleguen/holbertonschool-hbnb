@@ -211,4 +211,5 @@ class PlaceResource(Resource):
             places_ns.abort(403, 'You can only delete your own places')
         
         facade_instance.delete_place(place_id)
-        return {}, 204
+
+        return {"Place successfully deleted"}, 204
