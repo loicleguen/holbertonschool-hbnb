@@ -156,6 +156,16 @@ class ReviewResource(Resource):
         if review.user_id != current_user_id and not is_admin:
             reviews_ns.abort(403, 'You can only update your own reviews')
         
+        review_data = reviews_ns.payload
+        if 'user_id' in review_data or 'place_id' in review_data:
+            reviews_ns.abort(400, 'Cannot change user_id or place_id of a review')
+
+        try:
+            updated_review = facade_instance.update_review(review_id, review_data)
+            return updated_review.to_dict()
+        except ValueError as e:
+            reviews_ns.abort(400, str(e))
+            
         try:
             updated_review = facade_instance.update_review(review_id, reviews_ns.payload)
             if not updated_review:

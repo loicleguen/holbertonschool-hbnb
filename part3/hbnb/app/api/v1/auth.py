@@ -23,23 +23,19 @@ class Login(Resource):
     @auth_ns.response(400, 'Invalid input')
     @auth_ns.response(401, 'Invalid credentials')
     def post(self):
-        """Authenticate user and return a JWT token"""
-        credentials = auth_ns.payload
+        """User login to receive JWT access token"""
+        data = auth_ns.payload
+        email = data.get('email')
+        password = data.get('password')
         
-        # Step 1: Retrieve the user based on the provided email
-        user = facade_instance.get_user_by_email(credentials['email'])
-        
-        # Step 2: Check if the user exists and the password is correct
-        if not user or not user.verify_password(credentials['password']):
-            return {'error': 'Invalid credentials'}, 401
+        user = facade_instance.get_user_by_email(email)
 
-        # Step 3: Create a JWT token with the user's id and is_admin flag
-        access_token = create_access_token(
-            identity=str(user.id),
-            additional_claims={"is_admin": user.is_admin}
-        )
-        
-        # Step 4: Return the JWT token to the client
+        if not user or not user.check_password(password):
+            auth_ns.abort(401, 'Invalid email or password')
+
+        additional_claims = {'is_admin': user.is_admin}
+        access_token = create_access_token(identity=user.id, additional_claims=additional_claims)
+
         return {'access_token': access_token}, 200
 
 

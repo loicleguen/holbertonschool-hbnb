@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 """Defines the BaseModel class with SQLAlchemy"""
 
-from app import db
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from app import db
 
 
@@ -38,16 +37,14 @@ class BaseModel(db.Model):
         self.updated_at = datetime.utcnow()
         db.session.commit()
 
-    def to_dict(self, **kwargs):
-        """Convert instance to dictionary representation"""
-        data = {}
-        for column in self.__table__.columns:
-            value = getattr(self, column.name)
-            if isinstance(value, datetime):
-                data[column.name] = value.isoformat()
-            else:
-                data[column.name] = value
-        data['__class__'] = self.__class__.__name__
+    def to_dict(self):
+        """Return a dictionary representation of the instance."""
+        data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        
+        data['created_at'] = data['created_at'].isoformat() if isinstance(data['created_at'], datetime) else data['created_at']
+        data['updated_at'] = data['updated_at'].isoformat() if isinstance(data['updated_at'], datetime) else data['updated_at']
+        
+        data.pop('password', None)
         return data
 
     def __repr__(self):

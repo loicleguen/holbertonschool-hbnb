@@ -9,14 +9,13 @@ from email_validator import validate_email, EmailNotValidError
 
 class User(BaseModel):
     """User model mapped to database table"""
-    
-    __tablename__ = 'users'  # ✅ OBLIGATOIRE
-    
+    __tablename__ = 'users'
+
     # SQLAlchemy columns
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True, index=True)
-    password = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False) # <--- MODIFICATION: Add password column
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     # Relationships
@@ -41,9 +40,7 @@ class User(BaseModel):
             self.hash_password(password)
 
     def hash_password(self, password):
-        """Hash the password before storing it"""
-        if not password or len(password) < 6:
-            raise ValueError("Password must be at least 6 characters long")
+        """Hashes the password using bcrypt and sets it to the password attribute."""
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
@@ -81,12 +78,11 @@ class User(BaseModel):
         except EmailNotValidError as e:
             raise ValueError(f"Invalid email: {str(e)}")
 
-    def to_dict(self, **kwargs):
-        """Return dictionary representation without password"""
-        data = super().to_dict(**kwargs)
-        # Never expose password in API responses
-        data.pop('password', None)
-        return data
+    def to_dict(self): # <--- MODIFICATION: Update to_dict to exclude password
+        """Return a dictionary representation of the user, excluding the password hash."""
+        user_dict = super().to_dict()
+        user_dict.pop('password', None)
+        return user_dict
 
     def __repr__(self):
         """String representation of User"""

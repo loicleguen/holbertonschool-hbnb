@@ -72,14 +72,17 @@ class PlaceList(Resource):
     @places_ns.response(403, 'Unauthorized action')
     def post(self):
         """Register a new place (Protected - authentication required)"""
-        current_user_id = get_jwt_identity()
-        
+ 
         try:
-            place_data = request.get_json()
+            place_data = places_ns.payload
+
+            current_user_id = get_jwt_identity()
+
+            place_data['owner_id'] = current_user_id
             
             # Verify that the owner_id matches the authenticated user
-            if place_data.get('owner_id') != current_user_id:
-                places_ns.abort(403, 'You can only create places for yourself')
+            if 'owner_id' in places_ns.payload and places_ns.payload['owner_id'] != current_user_id:
+                places_ns.abort(403, 'Cannot set owner_id to another user')
             
             place = facade_instance.create_place(place_data)
 

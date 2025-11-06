@@ -4,6 +4,7 @@
 from app import db
 from app.models.BaseModel import BaseModel
 from sqlalchemy.orm import validates
+from sqlalchemy import ForeignKey
 
 
 # Association table for Many-to-Many relationship between Place and Amenity

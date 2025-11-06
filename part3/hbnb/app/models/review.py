@@ -4,6 +4,7 @@
 from app import db
 from app.models.BaseModel import BaseModel
 from sqlalchemy.orm import validates
+from sqlalchemy import ForeignKey
 
 
 class Review(BaseModel):
