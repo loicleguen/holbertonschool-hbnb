@@ -27,6 +27,17 @@ def create_app(config_class=DevelopmentConfig):
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
+
+    # Create tables
+    with app.app_context():
+        # Import models so SQLAlchemy knows about them
+        from app.models.user import User
+        from app.models.place import Place
+        from app.models.amenity import Amenity
+        from app.models.review import Review
+        
+        # Create all tables
+        db.create_all()
     
     # Initialize facade after app context is created
     global facade

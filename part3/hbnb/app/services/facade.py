@@ -41,9 +41,6 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
 
-    def get_users_by_ids(self, user_ids):
-        return [self.get_user(uid) for uid in user_ids if self.get_user(uid)]
-
     def get_all_user(self):
         return self.user_repo.get_all()
 
@@ -106,9 +103,6 @@ class HBnBFacade:
 
     def get_all_amenities(self):
         return self.amenity_repo.get_all()
-    
-    def get_amenities_by_ids(self, amenity_ids):
-        return [self.get_amenity(aid) for aid in amenity_ids if self.get_amenity(aid)]
 
     def update_amenity(self, amenity_id, amenity_data):
         amenity = self.get_amenity(amenity_id)
@@ -208,9 +202,6 @@ class HBnBFacade:
         # SQLAlchemy cascade will handle deletion of related reviews
         self.place_repo.delete(place_id)
         return True
-
-    def get_places_by_ids(self, place_ids):
-        return [self.get_place(pid) for pid in place_ids if self.get_place(pid)]
 
     # ======================
     # ===== REVIEWS =====

@@ -13,7 +13,12 @@ class Amenity(BaseModel):
     
     # SQLAlchemy columns
     name = db.Column(db.String(255), nullable=False, unique=True)
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=True, index=True)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True, index=True)
     
+    owner = db.relationship('User', backref='owned_amenities', lazy='subquery')
+    place = db.relationship('Place', foreign_keys=[place_id], backref='direct_amenities', lazy='subquery')
+
     # Many-to-Many relationship with Place (will be activated after Place model)
     places = db.relationship('Place', secondary='place_amenity', back_populates='amenities', lazy='subquery')
 
@@ -22,9 +27,10 @@ class Amenity(BaseModel):
         super().__init__(**kwargs)
         if name:
             self.name = name
-        
-        self._temp_place_id = place_id
-        self._temp_owner_id = owner_id
+        if place_id:
+            self.place_id = place_id
+        if owner_id:
+            self.owner_id = owner_id
 
     @validates('name')
     def validate_name(self, key, value):
@@ -38,11 +44,6 @@ class Amenity(BaseModel):
     def to_dict(self, **kwargs):
         """Return dictionary representation of the amenity"""
         data = super().to_dict(**kwargs)
-        
-        if hasattr(self, '_temp_place_id') and self._temp_place_id:
-            data['place_id'] = self._temp_place_id
-        if hasattr(self, '_temp_owner_id') and self._temp_owner_id:
-            data['owner_id'] = self._temp_owner_id
             
         return data
 
