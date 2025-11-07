@@ -88,14 +88,32 @@ class HBnBFacade:
         if self.amenity_repo.get_amenity_by_name(name):
             raise ValueError("Amenity name already exists")
         
-        # Preserve place_id and owner_id for API compatibility (stored as temp attrs)
+        place_id = amenity_data.get("place_id")
+        owner_id = amenity_data.get("owner_id")
+        
+        if place_id:
+            place = self.place_repo.get(place_id)
+            if not place:
+                raise ValueError(f"Place with id '{place_id}' not found")
+        
+        if owner_id:
+            owner = self.user_repo.get(owner_id)
+            if not owner:
+                raise ValueError(f"Owner with id '{owner_id}' not found")
+        
         amenity = Amenity(
             name=name,
-            place_id=amenity_data.get("place_id"),
-            owner_id=amenity_data.get("owner_id")
+            place_id=place_id,
+            owner_id=owner_id
         )
         
         self.amenity_repo.add(amenity)
+        
+        if place_id:
+            place = self.place_repo.get(place_id)
+            if place and amenity not in place.amenities:
+                place.amenities.append(amenity)
+        
         return amenity
 
     def get_amenity(self, amenity_id):
@@ -118,7 +136,21 @@ class HBnBFacade:
             if existing and existing.id != amenity_id:
                 raise ValueError("Amenity name already in use")
         
+        old_place_id = amenity.place_id
+        new_place_id = amenity_data.get('place_id')
+        
         amenity.update(amenity_data)
+        
+        if new_place_id and new_place_id != old_place_id:
+            if old_place_id:
+                old_place = self.place_repo.get(old_place_id)
+                if old_place and amenity in old_place.amenities:
+                    old_place.amenities.remove(amenity)
+            
+            new_place = self.place_repo.get(new_place_id)
+            if new_place and amenity not in new_place.amenities:
+                new_place.amenities.append(amenity)
+        
         return amenity
 
     def delete_amenity(self, amenity_id):
@@ -126,7 +158,11 @@ class HBnBFacade:
         if not amenity:
             return False
         
-        # SQLAlchemy will handle the many-to-many relationship cleanup
+        if amenity.place_id:
+            place = self.place_repo.get(amenity.place_id)
+            if place and amenity in place.amenities:
+                place.amenities.remove(amenity)
+        
         self.amenity_repo.delete(amenity_id)
         return True
 
