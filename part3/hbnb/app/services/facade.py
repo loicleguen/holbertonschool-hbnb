@@ -9,6 +9,7 @@ from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.review import Review
+from app import db
 
 
 class HBnBFacade:
@@ -113,6 +114,7 @@ class HBnBFacade:
             place = self.place_repo.get(place_id)
             if place and amenity not in place.amenities:
                 place.amenities.append(amenity)
+                db.session.commit()
         
         return amenity
 
@@ -150,6 +152,8 @@ class HBnBFacade:
             new_place = self.place_repo.get(new_place_id)
             if new_place and amenity not in new_place.amenities:
                 new_place.amenities.append(amenity)
+            
+            db.session.commit()
         
         return amenity
 
@@ -162,6 +166,7 @@ class HBnBFacade:
             place = self.place_repo.get(amenity.place_id)
             if place and amenity in place.amenities:
                 place.amenities.remove(amenity)
+                db.session.commit()
         
         self.amenity_repo.delete(amenity_id)
         return True
