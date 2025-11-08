@@ -17,7 +17,7 @@ This repository contains the HBnB project, developed in four progressive parts, 
 - [2. Sequence Diagrams for API Calls.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/2.%20Sequence%20Diagrams%20for%20API%20Calls.md): four UML Sequence Diagrams to map the flow of information for key API calls across the three layers
 - [3. Documentation Compilation.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/3.%20Documentation%20Compilation.md): a compilation of all diagrams and notes into a single, comprehensive Technical Document.
 
-## HBnB - BL and API
+## 🛠 HBnB - BL and API
 1.  **Layered Architecture:** Implemented a clean separation of concerns:
     * **Persistence Layer ([`app/persistence`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence)):** Abstracted data storage logic via a generic [`repository`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence/repository.py).
     * **Service Layer ([`app/services`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/services)):** Established a [`facade`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/services/facade.py) for centralized business logic.
@@ -28,6 +28,13 @@ This repository contains the HBnB project, developed in four progressive parts, 
     * [**Reviews**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/reviews.py)
     * [**Amenities**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/amenities.py)
 3.  **Environment Setup:** Finalized project configuration [`config.py`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/config.py) and dependency management [`requirements.txt`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/requirements.txt).
+
+## 🔐 HBnB - Auth & DB
+In this phase, the backend transitioned to a secure, persistent, and scalable architecture:
+1. **JWT Authentication & Authorization:** Implemented user authentication using **Flask-JWT-Extended** and secured endpoints with **role-based access control** (RBAC), allowing only administrators to perform critical actions.
+2. **SQLAlchemy ORM Integration:** Replaced the in-memory repository with a **SQLAlchemy-based persistence layer**, mapping all entities (`User`, `Place`, `Review`, `Amenity`) to a database (SQLite for development).
+3. **Relational Schema Design:** Designed the complete relational schema, including **one-to-many** and **many-to-many** relationships, and visualized the structure using a **Mermaid.js** Entity-Relationship Diagram.
+4. **Data Security:** Integrated **Bcrypt** for secure password hashing within the User model.
 
 ## Authors
 <div align="center">
