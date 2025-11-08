@@ -11,14 +11,18 @@ class Review(BaseModel):
     """Review model mapped to database table"""
     
     __tablename__ = 'reviews'
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'place_id', name='unique_user_place_review'),
+    )
     
     # SQLAlchemy columns
     text = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     
     # Foreign keys (One-to-Many relationships)
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False, index=True)
     
     # Relationships are defined via backref in User and Place models
 
@@ -50,26 +54,41 @@ class Review(BaseModel):
             raise ValueError("rating must be between 1 and 5")
         return value
 
-    def to_dict(self, users_map=None, places_map=None, **kwargs):
+    def to_dict(self, **kwargs):
         """
-        Returns a dictionary representation of the Review, 
-        including nested 'user' and 'place' objects if maps are provided.
+        Returns a dictionary representation of the Review
+        
+        All relationships (user, place) are loaded via SQLAlchemy
         """
         review_dict = super().to_dict(**kwargs)
 
-        # Handle user nesting (keep your original logic)
-        user_id = review_dict.get('user_id')
-        if user_id and users_map and user_id in users_map:
-            user_obj = users_map[user_id]
-            review_dict['user'] = user_obj.to_dict()
-            review_dict.pop('user_id', None)  # Remove user_id after nesting
+        # ----- USER ----- (SQLAlchemy relationship)
+        if hasattr(self, 'user') and self.user:
+            review_dict['user'] = {
+                'id': self.user.id,
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name
+            }
+        else:
+            review_dict['user'] = {
+                'id': review_dict.get('user_id'),
+                'first_name': None,
+                'last_name': None
+            }
+        review_dict.pop('user_id', None)
 
-        # Handle place nesting (keep your original logic)
-        place_id = review_dict.get('place_id')
-        if place_id and places_map and place_id in places_map:
-            place_obj = places_map[place_id]
-            review_dict['place'] = place_obj.to_dict()
-            review_dict.pop('place_id', None)  # Remove place_id after nesting
+        # ----- PLACE ----- (SQLAlchemy relationship)
+        if hasattr(self, 'place') and self.place:
+            review_dict['place'] = {
+                'id': self.place.id,
+                'title': self.place.title
+            }
+        else:
+            review_dict['place'] = {
+                'id': review_dict.get('place_id'),
+                'title': None
+            }
+        review_dict.pop('place_id', None)
 
         return review_dict
 

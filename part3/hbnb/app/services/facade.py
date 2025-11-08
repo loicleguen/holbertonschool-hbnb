@@ -8,7 +8,7 @@ from app.persistence.review_repository import ReviewRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
-from app.models.amenity import Amenity
+from app import db
 
 
 class HBnBFacade:
@@ -42,11 +42,7 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_user_by_email(email)
 
-    def get_users_by_ids(self, user_ids):
-        return [self.get_user(uid) for uid in user_ids if self.get_user(uid)]
-
-    def get_all_users(self):
-        """Retrieves all Users."""
+    def get_all_user(self):
         return self.user_repo.get_all()
 
     def update_user(self, user_id, data):
@@ -90,18 +86,33 @@ class HBnBFacade:
         if not name:
             raise ValueError("Amenity name is required")
         
-        # Check if amenity name already exists
-        if self.amenity_repo.get_amenity_by_name(name):
-            raise ValueError("Amenity name already exists")
+        place_id = amenity_data.get("place_id")
+        owner_id = amenity_data.get("owner_id")
         
-        # Preserve place_id and owner_id for API compatibility (stored as temp attrs)
+        if place_id:
+            place = self.place_repo.get(place_id)
+            if not place:
+                raise ValueError(f"Place with id '{place_id}' not found")
+        
+        if owner_id:
+            owner = self.user_repo.get(owner_id)
+            if not owner:
+                raise ValueError(f"Owner with id '{owner_id}' not found")
+        
         amenity = Amenity(
             name=name,
-            place_id=amenity_data.get("place_id"),
-            owner_id=amenity_data.get("owner_id")
+            place_id=place_id,
+            owner_id=owner_id
         )
         
         self.amenity_repo.add(amenity)
+        
+        if place_id:
+            place = self.place_repo.get(place_id)
+            if place and amenity not in place.amenities:
+                place.amenities.append(amenity)
+                db.session.commit()
+        
         return amenity
 
     def get_amenity(self, amenity_id):
@@ -109,9 +120,6 @@ class HBnBFacade:
 
     def get_all_amenities(self):
         return self.amenity_repo.get_all()
-    
-    def get_amenities_by_ids(self, amenity_ids):
-        return [self.get_amenity(aid) for aid in amenity_ids if self.get_amenity(aid)]
 
     def update_amenity(self, amenity_id, amenity_data):
         amenity = self.get_amenity(amenity_id)
@@ -122,12 +130,23 @@ class HBnBFacade:
             if field in amenity_data:
                 raise ValueError(f"Cannot update '{field}'")
         
-        if 'name' in amenity_data:
-            existing = self.amenity_repo.get_amenity_by_name(amenity_data['name'])
-            if existing and existing.id != amenity_id:
-                raise ValueError("Amenity name already in use")
+        old_place_id = amenity.place_id
+        new_place_id = amenity_data.get('place_id')
         
         amenity.update(amenity_data)
+        
+        if new_place_id and new_place_id != old_place_id:
+            if old_place_id:
+                old_place = self.place_repo.get(old_place_id)
+                if old_place and amenity in old_place.amenities:
+                    old_place.amenities.remove(amenity)
+            
+            new_place = self.place_repo.get(new_place_id)
+            if new_place and amenity not in new_place.amenities:
+                new_place.amenities.append(amenity)
+            
+            db.session.commit()
+        
         return amenity
 
     def delete_amenity(self, amenity_id):
@@ -135,7 +154,12 @@ class HBnBFacade:
         if not amenity:
             return False
         
-        # SQLAlchemy will handle the many-to-many relationship cleanup
+        if amenity.place_id:
+            place = self.place_repo.get(amenity.place_id)
+            if place and amenity in place.amenities:
+                place.amenities.remove(amenity)
+                db.session.commit()
+        
         self.amenity_repo.delete(amenity_id)
         return True
 
@@ -214,9 +238,6 @@ class HBnBFacade:
         # SQLAlchemy cascade will handle deletion of related reviews
         self.place_repo.delete(place_id)
         return True
-
-    def get_places_by_ids(self, place_ids):
-        return [self.get_place(pid) for pid in place_ids if self.get_place(pid)]
 
     # ======================
     # ===== REVIEWS =====

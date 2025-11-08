@@ -49,7 +49,7 @@ review_update_model = reviews_ns.model('ReviewUpdate', {
 @reviews_ns.route('/')
 class ReviewList(Resource):
     
-    @jwt_required()  # Protected: Authentication required
+    @jwt_required()
     @reviews_ns.expect(review_model, validate=True)
     @reviews_ns.response(201, 'Review successfully created', review_response_model)
     @reviews_ns.response(400, 'Invalid input data')
@@ -77,19 +77,14 @@ class ReviewList(Resource):
             if place.owner_id == current_user_id:
                 reviews_ns.abort(403, 'You cannot review your own place')
             
-            # Check if user has already reviewed this place using facade method
+            # Check if user has already reviewed this place
             if facade_instance.user_has_reviewed_place(current_user_id, place_id):
                 reviews_ns.abort(409, 'You have already reviewed this place')
             
             review = facade_instance.create_review(review_data)
             
-            user_obj = facade_instance.get_user(review.user_id)
-            place_obj = facade_instance.get_place(review.place_id)
-            
-            return review.to_dict(
-                users_map={review.user_id: user_obj},
-                places_map={review.place_id: place_obj}
-            ), 201
+            # SQLAlchemy charge automatiquement user et place
+            return review.to_dict(), 201
             
         except ValueError as e:
             reviews_ns.abort(400, str(e))
@@ -102,16 +97,8 @@ class ReviewList(Resource):
         """Retrieve a list of all reviews (Public)"""
         reviews = facade_instance.get_all_reviews()
         
-        user_ids = {r.user_id for r in reviews if r.user_id}
-        place_ids = {r.place_id for r in reviews if r.place_id}
-
-        users = {u.id: u for u in facade_instance.get_users_by_ids(list(user_ids))}
-        places = {p.id: p for p in facade_instance.get_places_by_ids(list(place_ids))}
-        
-        return [
-            r.to_dict(users_map=users, places_map=places) 
-            for r in reviews
-        ]
+        # SQLAlchemy charge automatiquement user et place pour chaque review
+        return [r.to_dict() for r in reviews]
 
 
 @reviews_ns.route('/<string:review_id>')
@@ -126,16 +113,11 @@ class ReviewResource(Resource):
         review = facade_instance.get_review(review_id)
         if not review:
             reviews_ns.abort(404, 'Review not found')
-            
-        user_obj = facade_instance.get_user(review.user_id)
-        place_obj = facade_instance.get_place(review.place_id)
+        
+        # SQLAlchemy charge automatiquement user et place
+        return review.to_dict()
 
-        return review.to_dict(
-            users_map={review.user_id: user_obj},
-            places_map={review.place_id: place_obj}
-        )
-
-    @jwt_required()  # 🔒 PROTECTED: Author only
+    @jwt_required()
     @reviews_ns.expect(review_update_model, validate=True)
     @reviews_ns.response(200, 'Review updated successfully', review_response_model)
     @reviews_ns.response(404, 'Review not found')
@@ -171,20 +153,15 @@ class ReviewResource(Resource):
             if not updated_review:
                 reviews_ns.abort(404, 'Review not found')
 
-            user_obj = facade_instance.get_user(updated_review.user_id)
-            place_obj = facade_instance.get_place(updated_review.place_id)
-
-            return updated_review.to_dict(
-                users_map={updated_review.user_id: user_obj},
-                places_map={updated_review.place_id: place_obj}
-            )
+            # SQLAlchemy charge automatiquement user et place
+            return updated_review.to_dict()
 
         except ValueError as e:
             reviews_ns.abort(400, str(e))
         except Exception as e:
             reviews_ns.abort(500, f"Internal error: {str(e)}")
 
-    @jwt_required()  # 🔒 PROTECTED: Author or admin
+    @jwt_required()
     @reviews_ns.response(204, 'Review deleted successfully')
     @reviews_ns.response(404, 'Review not found')
     @reviews_ns.response(403, 'Unauthorized action')
@@ -224,13 +201,5 @@ class PlaceReviewList(Resource):
 
         reviews = reviews_data if isinstance(reviews_data, list) else [reviews_data]
 
-        user_ids = {r.user_id for r in reviews if r.user_id}
-
-        users = {u.id: u for u in facade_instance.get_users_by_ids(list(user_ids))}
-        place_obj = facade_instance.get_place(place_id)
-        places = {place_id: place_obj} if place_obj else {}
-
-        return [
-            r.to_dict(users_map=users, places_map=places) 
-            for r in reviews
-        ]
+        # SQLAlchemy charge automatiquement user et place pour chaque review
+        return [r.to_dict() for r in reviews]

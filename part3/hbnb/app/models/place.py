@@ -4,13 +4,13 @@
 from app import db
 from app.models.BaseModel import BaseModel
 from sqlalchemy.orm import validates
-from sqlalchemy import ForeignKey
+from decimal import Decimal
 
 
-# Association table for Many-to-Many relationship between Place and Amenity
+# Association table for One-to-Many relationship between Place and Amenity
 place_amenity = db.Table('place_amenity',
-    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
-    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id', ondelete='CASCADE'), primary_key=True)
 )
 
 
@@ -20,14 +20,14 @@ class Place(BaseModel):
     __tablename__ = 'places'
     
     # SQLAlchemy columns
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     
     # Foreign key (One-to-Many relationship with User)
-    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
     
     # Relationships
     owner = db.relationship('User', back_populates='places')
@@ -59,18 +59,26 @@ class Place(BaseModel):
         """Validate title"""
         if not value or not isinstance(value, str) or not value.strip():
             raise ValueError("title must be a non-empty string")
-        if len(value) > 100:
-            raise ValueError("title must be less than 100 characters")
+        if len(value) > 255:
+            raise ValueError("title must be less than 255 characters")
         return value.strip()
 
     @validates('price')
     def validate_price(self, key, value):
         """Validate price"""
-        if value is None or not isinstance(value, (int, float)):
+        if value is None:
+            raise ValueError("Price is required")
+        
+        # Convert to Decimal for precision
+        try:
+            decimal_value = Decimal(str(value))
+        except:
             raise TypeError("Price must be a number")
-        if value < 0:
+        
+        if decimal_value < 0:
             raise ValueError("Price must be non-negative")
-        return float(value)
+        
+        return decimal_value
 
     @validates('latitude')
     def validate_latitude(self, key, value):
@@ -95,53 +103,55 @@ class Place(BaseModel):
         if amenity not in self.amenities:
             self.amenities.append(amenity)
 
-    def to_dict(self, owners_map=None, amenities_map=None, reviews_map=None, **kwargs):
+    def to_dict(self, **kwargs):
         """
-        Returns a dictionary representation of the Place, including:
-        - owner (full user info)
-        - amenities (id + name)
-        - reviews (id + text + rating)
+        Returns a dictionary representation of the Place
+        
+        All relationships (owner, amenities, reviews) are loaded via SQLAlchemy
         """
         place_dict = super().to_dict(**kwargs)
+        
+        # Convert Decimal to float for JSON serialization
+        if 'price' in place_dict and isinstance(place_dict['price'], Decimal):
+            place_dict['price'] = float(place_dict['price'])
 
-        # ----- OWNER -----
-        owner_id = place_dict.get('owner_id')
-        if owner_id and owners_map and owner_id in owners_map:
-            owner_obj = owners_map[owner_id]
-            place_dict['owner'] = owner_obj.to_dict()
-            place_dict.pop('owner_id', None)
-        else:
+        # ----- OWNER ----- (SQLAlchemy relationship)
+        if hasattr(self, 'owner') and self.owner:
             place_dict['owner'] = {
-                'id': owner_id,
+                'id': self.owner.id,
+                'first_name': self.owner.first_name,
+                'last_name': self.owner.last_name,
+                'email': self.owner.email
+            }
+        else:
+            # Fallback si owner n'est pas chargé
+            place_dict['owner'] = {
+                'id': place_dict.get('owner_id'),
                 'first_name': None,
                 'last_name': None,
                 'email': None
             }
-            place_dict.pop('owner_id', None)
+        place_dict.pop('owner_id', None)
 
-        # ----- AMENITIES -----
-        # SQLAlchemy amenities is already a list of Amenity objects
-        amenity_objs = self.amenities if hasattr(self, 'amenities') else []
+        # ----- AMENITIES ----- (SQLAlchemy relationship)
         place_dict['amenities'] = []
-        
-        for amenity in amenity_objs:
-            if hasattr(amenity, 'to_dict'):
-                place_dict['amenities'].append(amenity.to_dict())
-            elif hasattr(amenity, 'id'):
-                place_dict['amenities'].append({'id': amenity.id, 'name': getattr(amenity, 'name', None)})
+        if hasattr(self, 'amenities') and self.amenities:
+            for amenity in self.amenities:
+                place_dict['amenities'].append({
+                    'id': amenity.id,
+                    'name': amenity.name
+                })
 
-        # ----- REVIEWS -----
+        # ----- REVIEWS ----- (SQLAlchemy relationship)
         place_dict['reviews'] = []
-        if reviews_map:
-            for r in reviews_map:
-                if hasattr(r, 'to_dict'):
-                    place_dict['reviews'].append(r.to_dict())
-                else:
-                    place_dict['reviews'].append({
-                        'id': getattr(r, 'id', None),
-                        'text': getattr(r, 'text', None),
-                        'rating': getattr(r, 'rating', None)
-                    })
+        if hasattr(self, 'reviews') and self.reviews:
+            for review in self.reviews:
+                place_dict['reviews'].append({
+                    'id': review.id,
+                    'text': review.text,
+                    'rating': review.rating,
+                    'user_id': review.user_id
+                })
 
         return place_dict
 
