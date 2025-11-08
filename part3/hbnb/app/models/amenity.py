@@ -12,7 +12,7 @@ class Amenity(BaseModel):
     __tablename__ = 'amenities'
     
     # SQLAlchemy columns
-    name = db.Column(db.String(255), nullable=False, unique=True)
+    name = db.Column(db.String(255), nullable=False, unique=False)
     place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=True, index=True)
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True, index=True)
     
