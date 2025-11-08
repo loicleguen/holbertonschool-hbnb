@@ -1,64 +1,54 @@
 #!/usr/bin/python3
-"""Defines the BaseModel class"""
+"""Defines the BaseModel class with SQLAlchemy"""
 
+from app import db
 import uuid
 from datetime import datetime
 
-class BaseModel:
-    """Base class for all models, handling ID and timestamps"""
 
-    def __init__(self, *args, **kwargs):
-        """
-        Initializes a new object or deserializes from kwargs.
-        Kwargs are typically from the to_dict() method.
-        """
-        if kwargs:
-            for key, value in kwargs.items():
-                if key == "__class__":
-                    continue
-                # Deserialization: Convert string timestamps back to datetime objects
-                if key in ('created_at', 'updated_at') and isinstance(value, str):
-                    try:
-                        value = datetime.fromisoformat(value)
-                    except ValueError:
-                        # Handle case where datetime string format is invalid
-                        print(f"Warning: Could not deserialize datetime for key {key} with value {value}")
-                        continue
-                
-                # Set attribute on the instance
-                setattr(self, key, value)
-        else:
-            # New instance creation
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-
-    def __str__(self):
-        """Returns the string representation of the object"""
-        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
+class BaseModel(db.Model):
+    """Base model with SQLAlchemy - shared by all entities"""
+    
+    __abstract__ = True  # This ensures SQLAlchemy does not create a table for BaseModel
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def save(self):
-        """Update updated_at timestamp"""
-        self.updated_at = datetime.now()
+        """Save the current instance to the database"""
+        self.updated_at = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
 
-    def to_dict(self, **kwargs):
-        """Returns a dictionary representation of the instance, absorbing any extra arguments."""
-        data = self.__dict__.copy()
-
-        if 'created_at' in data:
-            data['created_at'] = data['created_at'].isoformat()
-        if 'updated_at' in data:
-            data['updated_at'] = data['updated_at'].isoformat()
-            
-        data['__class__'] = self.__class__.__name__
-        
-        return data
+    def delete(self):
+        """Delete the current instance from the database"""
+        db.session.delete(self)
+        db.session.commit()
 
     def update(self, data):
-        """Update attributes from dict, protect immutable fields"""
+        """Update instance attributes from dictionary"""
         for key, value in data.items():
-            if key in ['id', 'created_at']:
+            # Skip immutable and internal fields
+            if key in ['id', 'created_at', '__class__']:
                 continue
             if hasattr(self, key):
                 setattr(self, key, value)
-        self.save()
+        self.updated_at = datetime.utcnow()
+        db.session.commit()
+
+    def to_dict(self, **kwargs):
+        """Convert instance to dictionary representation"""
+        data = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, datetime):
+                data[column.name] = value.isoformat()
+            else:
+                data[column.name] = value
+        data['__class__'] = self.__class__.__name__
+        return data
+
+    def __repr__(self):
+        """String representation of the instance"""
+        return f"<{self.__class__.__name__} {self.id}>"

@@ -56,3 +56,56 @@ class InMemoryRepository(Repository):
             (obj for obj in self._storage.values() if getattr(obj, attr_name, None) == attr_value),
             None
         )
+
+
+# ========== AJOUTER CI-DESSOUS ==========
+
+from app import db
+
+
+class SQLAlchemyRepository(Repository):
+    """Generic SQLAlchemy repository for database operations"""
+    
+    def __init__(self, model):
+        """
+        Initialize repository with a SQLAlchemy model
+        
+        Args:
+            model: SQLAlchemy model class (e.g., User, Place, etc.)
+        """
+        self.model = model
+    
+    def add(self, obj):
+        """Add object to database"""
+        db.session.add(obj)
+        db.session.commit()
+        return obj
+    
+    def get(self, obj_id):
+        """Get object by ID"""
+        return self.model.query.get(obj_id)
+    
+    def get_all(self):
+        """Get all objects"""
+        return self.model.query.all()
+    
+    def update(self, obj_id, data):
+        """Update object by ID"""
+        obj = self.get(obj_id)
+        if obj:
+            obj.update(data)
+            return obj
+        return None
+    
+    def delete(self, obj_id):
+        """Delete object by ID"""
+        obj = self.get(obj_id)
+        if obj:
+            db.session.delete(obj)
+            db.session.commit()
+            return True
+        return False
+    
+    def get_by_attribute(self, attr_name, attr_value):
+        """Get object by attribute (generic method)"""
+        return self.model.query.filter_by(**{attr_name: attr_value}).first()
