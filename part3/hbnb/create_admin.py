@@ -17,6 +17,23 @@ with app.app_context():
     else:
         # Crée l'admin
         admin = User(
+            first_name="Loïc",
+            last_name="Le Guen",
+            email="loic@lo.ic",
+            is_admin=True
+        )
+        admin.hash_password("string")  # Hash le mot de passe
+        
+        db.session.add(admin)
+        db.session.commit()
+        
+        print("✅ Admin created successfully!")
+        print(f"   Email: {admin.email}")
+        print(f"   Password: string")
+        print(f"   ID: {admin.id}")
+        print(f"   Is Admin: {admin.is_admin}")
+
+        admin = User(
             first_name="Valentin",
             last_name="Tiquet",
             email="valentin@val.quet",
@@ -29,6 +46,6 @@ with app.app_context():
         
         print("✅ Admin created successfully!")
         print(f"   Email: {admin.email}")
-        print(f"   Password: admin123")
+        print(f"   Password: string")
         print(f"   ID: {admin.id}")
         print(f"   Is Admin: {admin.is_admin}")
