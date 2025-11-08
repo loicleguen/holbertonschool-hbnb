@@ -10,7 +10,7 @@ from email_validator import validate_email, EmailNotValidError
 class User(BaseModel):
     """User model mapped to database table"""
     
-    __tablename__ = 'users'  # ✅ OBLIGATOIRE
+    __tablename__ = 'users'
     
     # SQLAlchemy columns
     first_name = db.Column(db.String(255), nullable=False)
