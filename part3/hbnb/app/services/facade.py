@@ -85,10 +85,6 @@ class HBnBFacade:
         if not name:
             raise ValueError("Amenity name is required")
         
-        # Check if amenity name already exists
-        if self.amenity_repo.get_amenity_by_name(name):
-            raise ValueError("Amenity name already exists")
-        
         place_id = amenity_data.get("place_id")
         owner_id = amenity_data.get("owner_id")
         
@@ -132,11 +128,6 @@ class HBnBFacade:
         for field in ['id', 'created_at']:
             if field in amenity_data:
                 raise ValueError(f"Cannot update '{field}'")
-        
-        if 'name' in amenity_data:
-            existing = self.amenity_repo.get_amenity_by_name(amenity_data['name'])
-            if existing and existing.id != amenity_id:
-                raise ValueError("Amenity name already in use")
         
         old_place_id = amenity.place_id
         new_place_id = amenity_data.get('place_id')
