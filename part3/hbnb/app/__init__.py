@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-"""Initialize Flask app and register namespaces"""
+"""
+Flask application factory for HBnB API.
+Initializes Flask extensions (SQLAlchemy, JWT, Bcrypt), registers API namespaces, and configures error handlers.
+"""
 
 from flask import Flask, jsonify
 from flask_restx import Api
@@ -10,25 +13,36 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig
 
-# Initialize extensions
-bcrypt = Bcrypt()
-jwt = JWTManager()
-db = SQLAlchemy()
+# ========================================
+# Initialize Flask extensions (before app creation)
+# ========================================
+bcrypt = Bcrypt()  # Password hashing (bcrypt algorithm)
+jwt = JWTManager()  # JWT token management (authentication)
+db = SQLAlchemy()  # ORM for database operations
 
 # Facade will be imported after db is initialized to avoid circular imports
 facade = None
 
 
 def create_app(config_class=DevelopmentConfig):
+    """
+    Application factory pattern for creating Flask app instances.
+    Args: config_class: Configuration class (default: DevelopmentConfig)
+    Returns: Flask: Configured Flask application
+    """
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    # Initialize extensions
+    # ========================================
+    # Initialize extensions with app context
+    # ========================================
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
 
-    # Create tables
+    # ========================================
+    # Create database tables (development only)
+    # ========================================
     with app.app_context():
         # Import models so SQLAlchemy knows about them
         from app.models.user import User
@@ -36,10 +50,12 @@ def create_app(config_class=DevelopmentConfig):
         from app.models.amenity import Amenity
         from app.models.review import Review
         
-        # Create all tables
+        # Create all tables if they don't exist
         db.create_all()
     
+    # ========================================
     # Initialize facade after app context is created
+    # ========================================
     global facade
     from app.services.facade import HBnBFacade
     facade = HBnBFacade()
@@ -50,7 +66,10 @@ def create_app(config_class=DevelopmentConfig):
     
     @jwt.expired_token_loader
     def expired_token_callback(_jwt_header, _jwt_payload):
-        """Handle expired JWT tokens (Flask-JWT-Extended)"""
+        """
+        Handle expired JWT tokens (401 Unauthorized).
+        Triggered when token exp claim has passed.
+        """
         return jsonify({
             'error': 'Expired token',
             'message': 'The token has expired. Please login again.'
@@ -58,7 +77,10 @@ def create_app(config_class=DevelopmentConfig):
 
     @jwt.invalid_token_loader
     def invalid_token_callback(_error):
-        """Handle invalid JWT tokens (Flask-JWT-Extended)"""
+        """
+        Handle invalid JWT tokens (401 Unauthorized).
+        Triggered when signature verification fails or token is malformed.
+        """
         return jsonify({
             'error': 'Invalid token',
             'message': 'Signature verification failed or token is malformed.'
@@ -66,7 +88,10 @@ def create_app(config_class=DevelopmentConfig):
 
     @jwt.unauthorized_loader
     def missing_token_callback(_error):
-        """Handle missing JWT tokens (Flask-JWT-Extended)"""
+        """
+        Handle missing JWT tokens (401 Unauthorized).
+        Triggered when Authorization header is missing or doesn't contain 'Bearer <token>'.
+        """
         return jsonify({
             'error': 'Missing Authorization Header',
             'message': 'Request does not contain a valid access token.'
@@ -74,14 +99,17 @@ def create_app(config_class=DevelopmentConfig):
 
     @jwt.revoked_token_loader
     def revoked_token_callback(_jwt_header, _jwt_payload):
-        """Handle revoked JWT tokens (Flask-JWT-Extended)"""
+        """
+        Handle revoked JWT tokens (401 Unauthorized).
+        Triggered when token is in revocation list (if implemented).
+        """
         return jsonify({
             'error': 'Revoked token',
             'message': 'The token has been revoked.'
         }), 401
 
     # ========================================
-    # Configure JWT authorization in Swagger
+    # Configure JWT authorization in Swagger UI
     # ========================================
     authorizations = {
         'Bearer': {
@@ -92,24 +120,29 @@ def create_app(config_class=DevelopmentConfig):
         }
     }
 
-    # Initialize the API with JWT authorization support
+    # ========================================
+    # Initialize Flask-RESTX API with Swagger documentation
+    # ========================================
     api = Api(
         app,
         version='1.0',
         title='HBnB API',
         description='A simple API for HBnB by Loic & Val',
-        doc='/',
-        authorizations=authorizations,
-        security='Bearer'
+        doc='/',  # Swagger UI available at root path
+        authorizations=authorizations,  # Enable JWT auth in Swagger UI
+        security='Bearer'  # Apply Bearer auth globally
     )
 
     # ========================================
-    # GLOBAL ERROR HANDLERS (Flask + Flask-RESTX)
+    # GLOBAL ERROR HANDLERS (Flask-RESTX + PyJWT)
     # ========================================
     
     @api.errorhandler(ExpiredSignatureError)
     def handle_expired_signature(_error):
-        """Handle expired JWT tokens (PyJWT library)"""
+        """
+        Handle expired JWT tokens from PyJWT library (401 Unauthorized).
+        Catches errors raised by jwt.decode() when token exp has passed.
+        """
         return {
             'error': 'Expired token',
             'message': 'The token has expired. Please login again.'
@@ -117,7 +150,10 @@ def create_app(config_class=DevelopmentConfig):
 
     @api.errorhandler(InvalidTokenError)
     def handle_invalid_token(_error):
-        """Handle invalid JWT tokens (PyJWT library)"""
+        """
+        Handle invalid JWT tokens from PyJWT library (401 Unauthorized).
+        Catches errors raised by jwt.decode() when signature verification fails.
+        """
         return {
             'error': 'Invalid token',
             'message': 'Signature verification failed or token is malformed.'
@@ -125,20 +161,25 @@ def create_app(config_class=DevelopmentConfig):
 
     @api.errorhandler(NoAuthorizationError)
     def handle_no_authorization(_error):
-        """Handle missing authorization header"""
+        """
+        Handle missing authorization header (401 Unauthorized).
+        Catches errors raised by @jwt_required decorator when header is missing.
+        """
         return {
             'error': 'Missing Authorization Header',
             'message': 'Request does not contain a valid access token.'
         }, 401
 
-    # Import each namespace directly from its file
+    # ========================================
+    # Register API namespaces (route blueprints)
+    # ========================================
     from .api.v1.users import users_ns
     from .api.v1.places import places_ns
     from .api.v1.reviews import reviews_ns
     from .api.v1.amenities import amenities_ns
     from .api.v1.auth import auth_ns
 
-    # Add each namespace to the API with its path prefix
+    # Add namespaces to API with URL prefixes
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
