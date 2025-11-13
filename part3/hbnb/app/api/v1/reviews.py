@@ -24,6 +24,7 @@ from flask_restx import Namespace, Resource, fields
 from flask import request
 from app import facade as facade_instance
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from werkzeug.exceptions import HTTPException
 
 
 # Create a namespace for review-related operations
@@ -166,12 +167,24 @@ class ReviewList(Resource):
             # SQLAlchemy automatically loads related user and place data
             # via the configured relationships in the Review model
             return review.to_dict(), 201
-            
+        
+        except HTTPException:
+            # Re-raise HTTP exceptions (403, 404, 409, etc.)
+            # These are expected errors that should be returned to the client
+            raise
         except ValueError as e:
             # Handle validation errors (e.g., rating out of range)
             reviews_ns.abort(400, str(e))
         except Exception as e:
             # Handle unexpected errors
+            import traceback
+            print("=" * 80)
+            print("ERROR in POST /reviews:")
+            print(f"Exception type: {type(e).__name__}")
+            print(f"Exception message: {str(e)}")
+            print("Full traceback:")
+            traceback.print_exc()
+            print("=" * 80)
             reviews_ns.abort(500, f"Internal error: {str(e)}")
 
     @reviews_ns.marshal_list_with(review_response_model)
@@ -299,12 +312,23 @@ class ReviewResource(Resource):
 
             # SQLAlchemy automatically reloads relationships
             return updated_review.to_dict()
-
+        
+        except HTTPException:
+            # Re-raise HTTP exceptions (403, 404, etc.)
+            raise
         except ValueError as e:
             # Handle validation errors (e.g., invalid rating)
             reviews_ns.abort(400, str(e))
         except Exception as e:
             # Handle unexpected errors
+            import traceback
+            print("=" * 80)
+            print("ERROR in PUT /reviews:")
+            print(f"Exception type: {type(e).__name__}")
+            print(f"Exception message: {str(e)}")
+            print("Full traceback:")
+            traceback.print_exc()
+            print("=" * 80)
             reviews_ns.abort(500, f"Internal error: {str(e)}")
 
     @jwt_required()  # Requires valid JWT token
