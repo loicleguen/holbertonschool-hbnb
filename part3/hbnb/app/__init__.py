@@ -11,6 +11,7 @@ from flask_jwt_extended import JWTManager
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from config import DevelopmentConfig
 
 # ========================================
@@ -32,6 +33,17 @@ def create_app(config_class=DevelopmentConfig):
     """
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # ========================================
+    # ⭐ CONFIGURE CORS - AJOUTEZ CES LIGNES ICI ⭐
+    # ========================================
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": ["http://localhost:8000", "http://127.0.0.1:8000"],
+            "methods": ["GET", "POST", "PUT", "DELETE"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
     
     # ========================================
     # Initialize extensions with app context
