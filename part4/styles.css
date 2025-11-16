@@ -33,18 +33,19 @@ nav {
 .nav_left {
     display: flex;
     align-items: center;
+    margin-left: 1rem;
 }
 
 .nav_right {
     display: flex;
     gap: 1rem;
     align-items: center;
+    margin-right: 1rem;
 }
 
 nav a {
     color: #fff;
     text-decoration: none;
-    margin-left: 1rem;
 }
 
 main {
@@ -58,4 +59,157 @@ footer {
     text-align: center;
     padding: 1rem;
     margin-top: auto;
+}
+
+/* ========================================
+   SHARED STYLES - Réutilisables
+   ======================================== */
+
+/* Cards communes (place-card ET review-card) */
+.place-card,
+.review-card {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+/* Tous les boutons */
+.login-button,
+.details-button,
+.add-review.form button,
+#login-form button {
+    background-color: #333;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-button:hover,
+.details-button:hover,
+.add-review.form button:hover,
+#login-form button:hover {
+    background-color: #555;
+}
+
+/* Tous les formulaires */
+#login-form,
+.add-review.form {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+/* Tous les inputs, selects, textarea */
+#login-form input,
+#login-form select,
+.add-review.form input,
+.add-review.form select,
+.add-review.form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+#login-form input:focus,
+.add-review.form input:focus,
+.add-review.form select:focus,
+.add-review.form textarea:focus {
+    outline: none;
+    border-color: #333;
+}
+
+/* Tous les labels de formulaire */
+#login-form label,
+.add-review.form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Tous les div de formulaire */
+#login-form div,
+.add-review.form div {
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   SPECIFIC STYLES - Styles spécifiques
+   ======================================== */
+
+.logo {
+    display: block;
+}
+
+.details-button {
+    display: inline-block;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+}
+
+#login-form {
+    max-width: 400px;
+}
+
+#login-form button,
+.add-review.form button {
+    width: 100%;
+}
+
+.place-details {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.place-info {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.add-review.form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+#reviews-section {
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+#places-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+#filter {
+    max-width: 900px;
+    margin: 0 auto 2rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+#filter label {
+    margin-right: 1rem;
+    font-weight: bold;
+}
+
+#filter select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
