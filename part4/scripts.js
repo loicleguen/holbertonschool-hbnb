@@ -219,7 +219,6 @@ async function fetchPlaces(token = null) {
 function displayPlaces(places) {
     const placesList = document.getElementById('places-list');
     
-    // Clear current content
     placesList.innerHTML = '';
 
     if (!places || places.length === 0) {
@@ -227,17 +226,23 @@ function displayPlaces(places) {
         return;
     }
 
-    // Create a card for each place
     places.forEach(place => {
         const placeCard = document.createElement('div');
         placeCard.className = 'place-card';
-        placeCard.dataset.price = place.price_per_night || 0; // Store price for filtering
+        
+        // Adapt to API field names: title instead of name, price instead of price_per_night
+        const placeName = place.title || 'Unnamed Place';
+        const placePrice = place.price || 0;
+        const placeDescription = place.description || 'No description available.';
+        const placeLocation = `GPS: ${place.latitude?.toFixed(4) || '?'}°, ${place.longitude?.toFixed(4) || '?'}°`;
+        
+        placeCard.dataset.price = placePrice;
 
         placeCard.innerHTML = `
-            <h3>${place.name || 'Unnamed Place'}</h3>
-            <p><strong>Price:</strong> $${place.price_per_night || 0} per night</p>
-            <p><strong>Location:</strong> ${place.city || 'Unknown'}, ${place.country || 'Unknown'}</p>
-            <p>${place.description || 'No description available.'}</p>
+            <h3>${placeName}</h3>
+            <p><strong>Price:</strong> $${placePrice} per night</p>
+            <p><strong>Location:</strong> ${placeLocation}</p>
+            <p>${placeDescription}</p>
             <a href="place.html?id=${place.id}" class="details-button">View Details</a>
         `;
 
