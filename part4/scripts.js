@@ -2,15 +2,15 @@
   HBnB Client-Side Scripts
 */
 
-// Configuration de l'API
-const API_URL = 'http://localhost:5000/api/v1'; // Modifiez selon votre URL d'API
+// API Configuration
+const API_URL = 'http://localhost:5000/api/v1'; // Update according to your API URL
 
 // ========================================
-// UTILITY FUNCTIONS - Gestion des cookies
+// UTILITY FUNCTIONS - Cookie Management
 // ========================================
 
 /**
- * Récupère la valeur d'un cookie par son nom
+ * Retrieves the value of a cookie by its name
  */
 function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -20,7 +20,7 @@ function getCookie(name) {
 }
 
 /**
- * Définit un cookie
+ * Sets a cookie
  */
 function setCookie(name, value, days = 7) {
     const expires = new Date();
@@ -29,18 +29,27 @@ function setCookie(name, value, days = 7) {
 }
 
 /**
- * Supprime un cookie
+ * Deletes a cookie
  */
 function deleteCookie(name) {
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 }
 
 /**
- * Vérifie si l'utilisateur est authentifié
+ * Checks if the user is authenticated (simple version)
+ * @returns {boolean} true if a token exists, false otherwise
  */
-function checkAuthentication() {
+function isAuthenticated() {
     const token = getCookie('token');
     return token !== null;
+}
+
+/**
+ * Logout function
+ */
+function logout() {
+    deleteCookie('token');
+    window.location.href = 'login.html';
 }
 
 // ========================================
@@ -48,30 +57,38 @@ function checkAuthentication() {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // LOGIN PAGE
     const loginForm = document.getElementById('login-form');
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             
-            // Récupérer les valeurs du formulaire
+            // Retrieve form values
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             
-            // Validation côté client
+            // Client-side validation
             if (!email || !password) {
                 displayError('Please enter both email and password.');
                 return;
             }
             
-            // Appel à la fonction de login
+            // Call the login function
             await loginUser(email, password);
         });
+    }
+
+    // INDEX PAGE - List of Places
+    const placesList = document.getElementById('places-list');
+    if (placesList) {
+        checkAuthenticationAndFetchPlaces();
+        initializePriceFilter();
     }
 });
 
 /**
- * Fonction de connexion à l'API
+ * API login function
  */
 async function loginUser(email, password) {
     try {
@@ -86,35 +103,35 @@ async function loginUser(email, password) {
         if (response.ok) {
             const data = await response.json();
             
-            // Stocker le token JWT dans un cookie
-            setCookie('token', data.access_token, 7); // Cookie valide 7 jours
+            // Store JWT token in a cookie
+            setCookie('token', data.access_token, 7); // Cookie valid for 7 days
             
-            // Rediriger vers la page principale
+            // Redirect to the main page
             window.location.href = 'index.html';
         } else {
-            // Gérer les erreurs HTTP
+            // Handle HTTP errors
             const errorData = await response.json();
             const errorMessage = errorData.message || response.statusText;
             displayError(`Login failed: ${errorMessage}`);
         }
     } catch (error) {
-        // Gérer les erreurs réseau
+        // Handle network errors
         console.error('Login error:', error);
         displayError('Network error. Please check your connection and try again.');
     }
 }
 
 /**
- * Affiche un message d'erreur
+ * Displays an error message
  */
 function displayError(message) {
-    // Supprimer les anciennes erreurs
+    // Remove old errors
     const existingError = document.querySelector('.error-message');
     if (existingError) {
         existingError.remove();
     }
     
-    // Créer et afficher le nouveau message d'erreur
+    // Create and display the new error message
     const loginForm = document.getElementById('login-form');
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
@@ -128,16 +145,147 @@ function displayError(message) {
     
     loginForm.insertBefore(errorDiv, loginForm.firstChild);
     
-    // Supprimer l'erreur après 5 secondes
+    // Remove the error after 5 seconds
     setTimeout(() => {
         errorDiv.remove();
     }, 5000);
 }
 
+// ========================================
+// INDEX PAGE - List of Places
+// ========================================
+
 /**
- * Fonction de déconnexion
+ * Checks authentication and manages index page display
  */
-function logout() {
-    deleteCookie('token');
-    window.location.href = 'login.html';
+function checkAuthenticationAndFetchPlaces() {
+    const token = getCookie('token');
+    const loginLink = document.getElementById('login-link');
+
+    if (!token) {
+        // User not authenticated - show login link
+        if (loginLink) {
+            loginLink.style.display = 'block';
+        }
+        fetchPlaces();
+    } else {
+        // User authenticated - hide login link
+        if (loginLink) {
+            loginLink.style.display = 'none';
+        }
+        fetchPlaces(token);
+    }
+}
+
+/**
+ * Fetches the list of places from the API
+ */
+async function fetchPlaces(token = null) {
+    try {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // Add Authorization header if token is provided
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_URL}/places/`, {
+            method: 'GET',
+            headers: headers
+        });
+
+        if (response.ok) {
+            const places = await response.json();
+            displayPlaces(places);
+            // Store places globally for filtering
+            window.allPlaces = places;
+        } else {
+            console.error('Failed to fetch places:', response.statusText);
+            const placesList = document.getElementById('places-list');
+            placesList.innerHTML = '<p>Error loading places. Please try again later.</p>';
+        }
+    } catch (error) {
+        console.error('Error fetching places:', error);
+        const placesList = document.getElementById('places-list');
+        placesList.innerHTML = '<p>Network error. Please check your connection.</p>';
+    }
+}
+
+/**
+ * Displays the list of places
+ */
+function displayPlaces(places) {
+    const placesList = document.getElementById('places-list');
+    
+    // Clear current content
+    placesList.innerHTML = '';
+
+    if (!places || places.length === 0) {
+        placesList.innerHTML = '<p>No places available.</p>';
+        return;
+    }
+
+    // Create a card for each place
+    places.forEach(place => {
+        const placeCard = document.createElement('div');
+        placeCard.className = 'place-card';
+        placeCard.dataset.price = place.price_per_night || 0; // Store price for filtering
+
+        placeCard.innerHTML = `
+            <h3>${place.name || 'Unnamed Place'}</h3>
+            <p><strong>Price:</strong> $${place.price_per_night || 0} per night</p>
+            <p><strong>Location:</strong> ${place.city || 'Unknown'}, ${place.country || 'Unknown'}</p>
+            <p>${place.description || 'No description available.'}</p>
+            <a href="place.html?id=${place.id}" class="details-button">View Details</a>
+        `;
+
+        placesList.appendChild(placeCard);
+    });
+}
+
+/**
+ * Initializes the price filter
+ */
+function initializePriceFilter() {
+    const priceFilter = document.getElementById('price-filter');
+    
+    if (!priceFilter) return;
+
+    // Populate filter options
+    priceFilter.innerHTML = `
+        <option value="">All</option>
+        <option value="10">Up to $10</option>
+        <option value="50">Up to $50</option>
+        <option value="100">Up to $100</option>
+    `;
+
+    // Add event listener for filtering
+    priceFilter.addEventListener('change', (event) => {
+        filterPlacesByPrice(event.target.value);
+    });
+}
+
+/**
+ * Filters places by price (client-side)
+ */
+function filterPlacesByPrice(maxPrice) {
+    const placeCards = document.querySelectorAll('.place-card');
+
+    placeCards.forEach(card => {
+        const price = parseFloat(card.dataset.price);
+
+        if (maxPrice === '' || maxPrice === 'All') {
+            // Show all places
+            card.style.display = 'block';
+        } else {
+            // Show only places within the price range
+            if (price <= parseFloat(maxPrice)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        }
+    });
 }
