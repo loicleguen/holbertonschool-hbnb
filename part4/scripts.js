@@ -238,6 +238,21 @@ document.addEventListener('DOMContentLoaded', () => {
         checkAuthenticationForPlace();
 
         fetchPlaceDetails(placeId);
+        
+        // Add Review button click event (toggle form visibility)
+        const addReviewButton = document.getElementById('add-review-button');
+        if (addReviewButton) {
+            addReviewButton.addEventListener('click', toggleReviewForm);
+        }
+        
+        // Review form submit event
+        const reviewForm = document.getElementById('review-form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                await submitReview(placeId);
+            });
+        }
     }
 });
 
@@ -488,17 +503,24 @@ function getPlaceIdFromURL() {
 function checkAuthenticationForPlace() {
     const token = getCookie('token');
     const addReviewButton = document.getElementById('add-review-button');
+    const addReviewForm = document.getElementById('review-form');
     
     if (!token) {
         console.log('🔒 User not authenticated - Add Review button hidden');
         if (addReviewButton) {
             addReviewButton.style.display = 'none';
         }
+        if (addReviewForm) {
+            addReviewForm.style.display = 'none';
+        }
         return null;
     } else {
-        console.log('🔓 User authenticated - Add Review button visible');
+        console.log('🔓 User authenticated - Add Review section visible');
         if (addReviewButton) {
             addReviewButton.style.display = 'block';
+        }
+        if (addReviewForm) {
+            addReviewForm.style.display = 'none';
         }
         return token;
     }
@@ -667,4 +689,122 @@ function displayReviews(reviews) {
         
         reviewsList.appendChild(reviewCard);
     });
+}
+
+// ========================================
+// ADD REVIEW FUNCTIONALITY
+// ========================================
+
+/**
+ * Toggle (show/hide) the review form
+ */
+function toggleReviewForm() {
+    const reviewForm = document.getElementById('review-form');
+    
+    if (!reviewForm) {
+        console.error('❌ Review form not found in HTML');
+        return;
+    }
+    
+    // Toggle display (show if hidden, hide if shown)
+    if (reviewForm.style.display === 'none' || reviewForm.style.display === '') {
+        reviewForm.style.display = 'block';
+        console.log('📝 Review form opened');
+    } else {
+        reviewForm.style.display = 'none';
+        console.log('❌ Review form closed');
+    }
+}
+
+/**
+ * Submit a review for the current place
+ * @param {string} placeId - The UUID of the place
+ */
+async function submitReview(placeId) {
+    // Check authentication
+    const token = getCookie('token');
+    if (!token) {
+        alert('⚠️ You must be logged in to submit a review.');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Get form values
+    const reviewText = document.getElementById('review-text').value.trim();
+    const reviewRating = parseInt(document.getElementById('review-rating').value);
+    
+    // Validation
+    if (!reviewText || reviewText.length < 5) {
+        alert('⚠️ Please enter a review with at least 5 characters.');
+        return;
+    }
+    
+    if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
+        alert('⚠️ Please select a rating between 1 and 5 stars.');
+        return;
+    }
+    
+    console.log('📤 Submitting review:', { text: reviewText, rating: reviewRating });
+    
+    try {
+        // Make POST request to submit review
+        const response = await fetch(`${API_URL}/places/${placeId}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                text: reviewText,
+                rating: reviewRating
+            })
+        });
+        
+        if (response.ok) {
+            const newReview = await response.json();
+            console.log('✅ Review submitted successfully:', newReview);
+            
+            // Clear form
+            document.getElementById('review-text').value = '';
+            document.getElementById('review-rating').value = '5';
+            
+            // Hide form
+            toggleReviewForm();
+            
+            // Show success message
+            alert('✅ Review submitted successfully!');
+            
+            // Refresh place details to show new review
+            fetchPlaceDetails(placeId);
+            
+        } else if (response.status == 409) {
+            const errorData = await response.json();
+            throw new Error('⚠️ You have already reviewed this place. Please choose another place to review.');
+            
+        } else if (response.status === 401) {
+            throw new Error('Unauthorized - Please login again');
+            
+        } else if (response.status === 403) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Forbidden - You cannot review your own place');
+            
+        } else if (response.status === 400) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Invalid review data');
+            
+        } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error submitting review:', error);
+        alert(`❌ Error: ${error.message}`);
+        
+        // If unauthorized, redirect to login
+        if (error.message.includes('Unauthorized')) {
+            deleteCookie('token');
+            localStorage.removeItem('tokenExpiration');
+            window.location.href = 'login.html';
+        }
+    }
 }
