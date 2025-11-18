@@ -27,12 +27,45 @@
             </div>
             <div>
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <div style="position: relative;">
+                    <input type="password" id="password" name="password" required style="padding-right: 3.2em; width: 100%;">
+                    <button type="button" id="toggle-password" aria-label="Show password"
+                        style="
+                            position: absolute;
+                            right: 0.2em;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0;
+                            height: 2.5em;
+                            width: 2.5em;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                        <span id="eye-icon" style="font-size: 2.2em; line-height: 1;">👁️</span>
+                    </button>
+                </div>
             </div>
             <button type="submit" class="login-button">Login</button>
         </form>
     </main>
     <footer>© 2025 HBnB. All rights reserved.</footer>
     <script src="scripts.js"></script>
+    <script>
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                pwd.type = 'password';
+                icon.textContent = '👁️';
+            }
+        });
+    </script>
 </body>
 </html>
