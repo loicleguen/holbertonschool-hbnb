@@ -158,10 +158,7 @@ footer {
     margin-bottom: 1rem;
 }
 
-/* ========================================
-   SPECIFIC STYLES - Styles spécifiques
-   ======================================== */
-
+/* SPECIFIC STYLES - Styles spécifiques */
 .logo {
     display: block;
 }
@@ -229,4 +226,25 @@ footer {
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 5px;
+}
+
+/* LOGOUT BUTTON - Bouton de déconnexion */
+.logout-button {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+.logout-button:active {
+    background-color: #bd2130;
 }

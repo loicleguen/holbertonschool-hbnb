@@ -48,8 +48,33 @@ function isAuthenticated() {
  * Logout function
  */
 function logout() {
+    console.log('🚪 Logging out...');
     deleteCookie('token');
-    window.location.href = 'login.html';
+    alert('You have been logged out successfully.');
+    window.location.href = 'index.html';
+}
+
+/**
+ * Updates header links based on authentication status
+ * Shows/hides Login and Logout buttons
+ */
+function updateHeaderLinks() {
+    // Use class selector to match your HTML structure
+    const loginButton = document.querySelector('.login-button');
+    const logoutButton = document.getElementById('logout-button');
+    const token = getCookie('token');
+
+    if (token) {
+        // User is authenticated - hide Login, show Logout
+        if (loginButton) loginButton.style.display = 'none';
+        if (logoutButton) logoutButton.style.display = 'inline-block';
+        console.log('🔓 Header updated: User authenticated');
+    } else {
+        // User is NOT authenticated - show Login, hide Logout
+        if (loginButton) loginButton.style.display = 'inline-block';
+        if (logoutButton) logoutButton.style.display = 'none';
+        console.log('🔒 Header updated: User not authenticated');
+    }
 }
 
 // ========================================
@@ -57,6 +82,16 @@ function logout() {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // UPDATE HEADER LINKS (ALL PAGES)
+    updateHeaderLinks();
+
+    // LOGOUT BUTTON CLICK EVENT
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+    }
+
     // LOGIN PAGE
     const loginForm = document.getElementById('login-form');
 
@@ -84,6 +119,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (placesList) {
         checkAuthenticationAndFetchPlaces();
         initializePriceFilter();
+    }
+
+    // PLACE DETAILS PAGE - Get Place ID
+    const placeInfo = document.querySelector('.place-info');
+    if (placeInfo) {
+        const placeId = getPlaceIdFromURL();
+        console.log('🔍 Place ID from URL:', placeId);
+        
+        if (!placeId) {
+            console.error('❌ No Place ID found in URL');
+            placeInfo.innerHTML = `
+                <div class="error-message">
+                    <h2>Invalid Place</h2>
+                    <p>No place ID provided in the URL.</p>
+                    <a href="index.html" class="button">Back to Home</a>
+                </div>
+            `;
+            return;
+        }
+        
+        console.log('✅ Place ID successfully extracted:', placeId);
+
+        // Check authentication
+        checkAuthenticationForPlace();
+
+        fetchPlaceDetails(placeId);
     }
 });
 
@@ -264,6 +325,8 @@ function initializePriceFilter() {
         <option value="10">Up to $10</option>
         <option value="50">Up to $50</option>
         <option value="100">Up to $100</option>
+        <option value="200">Up to $200</option>
+        <option value="300">Up to $300</option>
     `;
 
     // Add event listener for filtering
@@ -293,4 +356,119 @@ function filterPlacesByPrice(maxPrice) {
             }
         }
     });
+}
+
+/**
+ * Extract the place ID from the URL query parameters
+ * Example URL: place.html?id=abc-123-def-456
+ * Returns: "abc-123-def-456"
+ */
+function getPlaceIdFromURL() {
+    // Get the query string from the URL (e.g., "?id=abc-123")
+    const params = new URLSearchParams(window.location.search);
+    
+    // Extract the 'id' parameter
+    const placeId = params.get('id');
+    
+    if (!placeId) {
+        console.error('No place ID found in URL');
+        return null;
+    }
+    
+    return placeId;
+}
+
+// ========================================
+// Authentication Functions for Place Details
+// ========================================
+
+/**
+ * Check if the user is authenticated for the place details page
+ * Show/hide the "Add Review" button based on authentication status
+ * @returns {string|null} - JWT token if authenticated, null otherwise
+ */
+function checkAuthenticationForPlace() {
+    const token = getCookie('token');
+    const addReviewButton = document.getElementById('add-review-button');
+    
+    if (!token) {
+        console.log('🔒 User not authenticated - Add Review button hidden');
+        if (addReviewButton) {
+            addReviewButton.style.display = 'none';
+        }
+        return null;
+    } else {
+        console.log('🔓 User authenticated - Add Review button visible');
+        if (addReviewButton) {
+            addReviewButton.style.display = 'block';
+        }
+        return token;
+    }
+}
+
+
+/**
+ * Fetch the details of a specific place from the API
+ * @param {string} placeId - The UUID of the place
+ */
+async function fetchPlaceDetails(placeId) {
+    try {
+        console.log('🌐 Fetching place details for ID:', placeId);
+        
+        // Get JWT token from cookies (if available)
+        const token = getCookie('token');
+        
+        // Prepare request headers
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Include JWT token in Authorization header if available
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+            console.log('🔑 Request with authentication token');
+        } else {
+            console.log('🔓 Request without authentication token');
+        }
+        
+        // Make GET request to fetch place details
+        const response = await fetch(`${API_URL}/places/${placeId}`, {
+            method: 'GET',
+            headers: headers
+        });
+        
+        // Handle HTTP errors
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Place not found');
+            } else if (response.status === 401) {
+                throw new Error('Unauthorized - Please login');
+            } else if (response.status === 403) {
+                throw new Error('Forbidden - Access denied');
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        }
+        
+        // Parse JSON response
+        const place = await response.json();
+        
+        console.log('✅ Place details fetched successfully:', place);
+        
+        // Step 4: Display the place details on the page (next step)
+        displayPlaceDetails(place);
+        
+    } catch (error) {
+        console.error('❌ Error fetching place details:', error);
+        
+        // Display error message to user
+        const placeInfo = document.querySelector('.place-info');
+        placeInfo.innerHTML = `
+            <div class="error-message">
+                <h2>Error Loading Place</h2>
+                <p>${error.message}</p>
+                <a href="index.html" class="button">⬅️ Back to Home</a>
+            </div>
+        `;
+    }
 }
