@@ -472,3 +472,101 @@ async function fetchPlaceDetails(placeId) {
         `;
     }
 }
+
+
+/**
+ * Display place details on the page
+ * @param {Object} place - The place object from the API
+ */
+function displayPlaceDetails(place) {
+    const placeInfo = document.querySelector('.place-info');
+    
+    // Clear existing content (remove "Loading..." message)
+    placeInfo.innerHTML = '';
+    
+    // Create and populate place details HTML
+    const placeHTML = `
+        <h1>${place.title}</h1>
+        
+        <div class="place-meta">
+            <p><strong>🏠 Host:</strong> ${place.owner?.first_name || 'Unknown'} ${place.owner?.last_name || ''}</p>
+            <p><strong>💰 Price:</strong> $${place.price} per night</p>
+            <p><strong>📍 Location:</strong> GPS ${place.latitude?.toFixed(4) || '?'}°, ${place.longitude?.toFixed(4) || '?'}°</p>
+        </div>
+        
+        <div class="place-description">
+            <h2>📝 Description</h2>
+            <p>${place.description || 'No description available.'}</p>
+        </div>
+        
+        <div class="place-amenities">
+            <h2>✨ Amenities</h2>
+            ${displayAmenities(place.amenities)}
+        </div>
+    `;
+    
+    placeInfo.innerHTML = placeHTML;
+    
+    // Display reviews
+    displayReviews(place.reviews);
+}
+
+/**
+ * Format amenities list for display
+ * @param {Array} amenities - Array of amenity objects
+ * @returns {string} - HTML string of amenities
+ */
+function displayAmenities(amenities) {
+    if (!amenities || amenities.length === 0) {
+        return '<p class="no-amenities">No amenities listed.</p>';
+    }
+    
+    const amenitiesList = amenities.map(amenity => 
+        `<span class="amenity-tag">✨ ${amenity.name}</span>`
+    ).join('');
+    
+    return `<div class="amenities-container">${amenitiesList}</div>`;
+}
+
+/**
+ * Display reviews for the place
+ * @param {Array} reviews - Array of review objects
+ */
+function displayReviews(reviews) {
+    const reviewsList = document.getElementById('reviews-list');
+    
+    if (!reviewsList) {
+        console.warn('⚠️ reviews-list element not found in HTML');
+        return;
+    }
+    
+    // Clear existing reviews
+    reviewsList.innerHTML = '';
+    
+    if (!reviews || reviews.length === 0) {
+        reviewsList.innerHTML = '<p class="no-reviews">No reviews yet. Be the first to review this place! ⭐</p>';
+        return;
+    }
+    
+    console.log(`📝 Displaying ${reviews.length} review(s)`);
+    
+    // Create review cards
+    reviews.forEach(review => {
+        const reviewCard = document.createElement('div');
+        reviewCard.className = 'review-card';
+        
+        // Generate star rating
+        const fullStars = '⭐'.repeat(review.rating);
+        const emptyStars = '☆'.repeat(5 - review.rating);
+        
+        reviewCard.innerHTML = `
+            <div class="review-header">
+                <strong>👤 User ${review.user_id?.substring(0, 8) || 'Unknown'}...</strong>
+                <span class="review-rating">${fullStars}${emptyStars} (${review.rating}/5)</span>
+            </div>
+            <p class="review-text">${review.text}</p>
+        `;
+        
+        reviewsList.appendChild(reviewCard);
+    });
+}

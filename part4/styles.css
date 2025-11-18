@@ -78,20 +78,6 @@ footer {
     margin-top: auto;
 }
 
-/* ========================================
-   SHARED STYLES - Réutilisables
-   ======================================== */
-
-/* Cards communes (place-card ET review-card) */
-.place-card,
-.review-card {
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #fff;
-}
-
 /* Tous les boutons */
 .login-button,
 .details-button,
@@ -183,14 +169,6 @@ footer {
     margin: 0 auto;
 }
 
-.place-info {
-    background-color: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
 .add-review.form textarea {
     resize: vertical;
     min-height: 120px;
@@ -247,4 +225,203 @@ footer {
 
 .logout-button:active {
     background-color: #bd2130;
+}
+
+
+/* PLACE DETAILS PAGE - Styles détaillés */
+
+/* Titre principal du place */
+.place-info h1 {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 0.5rem;
+}
+
+/* Bloc d'informations principales (Host, Price, Location) */
+.place-meta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.place-meta p {
+    margin: 0.75rem 0;
+    font-size: 1.1rem;
+}
+
+/* Section Description */
+.place-description {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.place-description h2 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.place-description p {
+    line-height: 1.8;
+    color: #555;
+    font-size: 1.05rem;
+}
+
+/* Section Amenities */
+.place-amenities {
+    margin-bottom: 2rem;
+}
+
+.place-amenities h2 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.amenities-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.amenity-tag {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.amenity-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.no-amenities {
+    color: #888;
+    font-style: italic;
+}
+
+/* Section Reviews */
+#reviews-list {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.review-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.review-header strong {
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.review-rating {
+    color: #ffc107;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.review-text {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.no-reviews {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Message d'erreur */
+.error-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.error-message h2 {
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+.error-message p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.error-message .button {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.error-message .button:hover {
+    background: #0056b3;
+}
+
+/* Bouton Add Review (caché par défaut) */
+#add-review-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+#add-review-button:hover {
+    background-color: #218838;
+}
+
+#add-review-button:active {
+    transform: scale(0.98);
 }
