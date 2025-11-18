@@ -21,11 +21,16 @@ function getCookie(name) {
 
 /**
  * Sets a cookie
+ * @param {string} name - Cookie name
+ * @param {string} value - Cookie value
+ * @param {number} hours - Cookie expiration in hours (default: 1 hour)
  */
-function setCookie(name, value, days = 7) {
+function setCookie(name, value, hours = 1) {
     const expires = new Date();
-    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    expires.setTime(expires.getTime() + hours * 60 * 60 * 1000); // Convertir heures en millisecondes
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+    
+    console.log(`🍪 Cookie "${name}" set for ${hours} hour(s)`);
 }
 
 /**
@@ -49,8 +54,17 @@ function isAuthenticated() {
  */
 function logout() {
     console.log('🚪 Logging out...');
+    
+    // Delete the authentication token
     deleteCookie('token');
+    
+    // Clear expiration time from localStorage
+    localStorage.removeItem('tokenExpiration');
+    
+    // Optional: Show a confirmation message
     alert('You have been logged out successfully.');
+    
+    // Redirect to home page
     window.location.href = 'index.html';
 }
 
@@ -78,10 +92,89 @@ function updateHeaderLinks() {
 }
 
 // ========================================
+// AUTO-LOGOUT SYSTEM - Token Expiration
+// ========================================
+
+/**
+ * Store token expiration time in localStorage
+ * @param {number} hours - Token validity duration in hours
+ */
+function setTokenExpiration(hours = 1) {
+    const expirationTime = new Date().getTime() + (hours * 60 * 60 * 1000);
+    localStorage.setItem('tokenExpiration', expirationTime);
+    console.log(`⏰ Token will expire in ${hours} hour(s)`);
+}
+
+/**
+ * Check if the token has expired
+ * @returns {boolean} - true if expired, false otherwise
+ */
+function isTokenExpired() {
+    const expirationTime = localStorage.getItem('tokenExpiration');
+    
+    if (!expirationTime) {
+        return true;
+    }
+    
+    const now = new Date().getTime();
+    return now > parseInt(expirationTime);
+}
+
+/**
+ * Auto-logout if token is expired
+ */
+function checkTokenExpiration() {
+    const token = getCookie('token');
+    
+    if (token && isTokenExpired()) {
+        console.log('⏰ Token expired - Auto logout');
+        deleteCookie('token');
+        localStorage.removeItem('tokenExpiration');
+        alert('Your session has expired. Please login again.');
+        window.location.href = 'login.html';
+    }
+}
+
+/**
+ * Start a timer to auto-logout when token expires
+ */
+function startExpirationTimer() {
+    const expirationTime = localStorage.getItem('tokenExpiration');
+    
+    if (!expirationTime) return;
+    
+    const now = new Date().getTime();
+    const timeUntilExpiration = parseInt(expirationTime) - now;
+    
+    if (timeUntilExpiration <= 0) {
+        checkTokenExpiration();
+        return;
+    }
+    
+    const warningTime = timeUntilExpiration - (5 * 60 * 1000);
+    
+    if (warningTime > 0) {
+        setTimeout(() => {
+            if (getCookie('token')) {
+                alert('⚠️ Your session will expire in 5 minutes. Please save your work.');
+            }
+        }, warningTime);
+    }
+    
+    setTimeout(() => {
+        checkTokenExpiration();
+    }, timeUntilExpiration);
+}
+
+// ========================================
 // LOGIN FUNCTIONALITY
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // CHECK TOKEN EXPIRATION ON PAGE LOAD
+    checkTokenExpiration();
+    startExpirationTimer();
 
     // UPDATE HEADER LINKS (ALL PAGES)
     updateHeaderLinks();
@@ -164,8 +257,13 @@ async function loginUser(email, password) {
         if (response.ok) {
             const data = await response.json();
             
-            // Store JWT token in a cookie
-            setCookie('token', data.access_token, 7); // Cookie valid for 7 days
+            // Store JWT token in a cookie (valid for 1 hour)
+            setCookie('token', data.access_token, 1); // Cookie valid for 1 hour
+            
+            // Store expiration time in localStorage
+            setTokenExpiration(1); // 1 hour
+
+            console.log('✅ Login successful - Token expires in 1 hour');
             
             // Redirect to the main page
             window.location.href = 'index.html';
