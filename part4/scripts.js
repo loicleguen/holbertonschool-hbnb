@@ -162,7 +162,10 @@ function startExpirationTimer() {
     }
     
     setTimeout(() => {
-        checkTokenExpiration();
+        deleteCookie('token');
+        localStorage.removeItem('tokenExpiration');
+        alert('Your session has expired. Please login again.');
+        window.location.href = 'login.html';
     }, timeUntilExpiration);
 }
 
@@ -175,8 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // CHECK TOKEN EXPIRATION ON PAGE LOAD
     checkTokenExpiration();
     startExpirationTimer();
-
-    // UPDATE HEADER LINKS (ALL PAGES)
+    setInterval(checkTokenExpiration, 2000);
     updateHeaderLinks();
 
     // LOGOUT BUTTON CLICK EVENT
