@@ -689,7 +689,10 @@ function displayReviews(reviews) {
         
         reviewCard.innerHTML = `
             <div class="review-header">
-                <strong>👤 User ${review.user_id?.substring(0, 8) || 'Unknown'}...</strong>
+                <strong>
+                    <img src="images/user.png" alt="User" style="height:1em;vertical-align:middle;margin-right:0.3em;">
+                    User ${review.user_id?.substring(0, 8) || 'Unknown'}...
+                </strong>
                 <span class="review-rating">${fullStars}${emptyStars} (${review.rating}/5)</span>
             </div>
             <p class="review-text">${review.text}</p>
