@@ -678,8 +678,14 @@ function displayReviews(reviews) {
         reviewCard.className = 'review-card';
         
         // Generate star rating
-        const fullStars = '⭐'.repeat(review.rating);
-        const emptyStars = '☆'.repeat(5 - review.rating);
+        let fullStars = '';
+        for (let i = 0; i < review.rating; i++) {
+            fullStars += '<img src="images/star.png" alt="star" style="height:1em;vertical-align:middle;">';
+        }
+        let emptyStars = '';
+        for (let i = review.rating; i < 5; i++) {
+            emptyStars += '<img src="images/empty_star.png" alt="empty star" style="height:1em;vertical-align:middle;">';
+        }
         
         reviewCard.innerHTML = `
             <div class="review-header">
