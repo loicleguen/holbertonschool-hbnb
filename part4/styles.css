@@ -7,7 +7,7 @@
 }
 
 body {
-    background-color: #f4f4f4;
+    background-color: #ffffff;
     color: #333;
     display: flex;
     flex-direction: column;
@@ -15,8 +15,8 @@ body {
 }
 
 header {
-    background-color: #333;
-    color: #fff;
+    background-color: #000000;
+    color: #ffffff;
     padding: 1rem;
 }
 
@@ -40,7 +40,7 @@ nav {
 }
 
 nav a {
-    color: #fff;
+    color: #ffffff;
     text-decoration: none;
 }
 
