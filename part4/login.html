@@ -45,7 +45,7 @@
                             align-items: center;
                             justify-content: center;
                         ">
-                        <span id="eye-icon" style="font-size: 2.2em; line-height: 1;">👁️</span>
+                        <img id="eye-icon" src="images/open_eyes.png" alt="Show password" style="height: 2.2em;">
                     </button>
                 </div>
             </div>
@@ -60,10 +60,12 @@
             const icon = document.getElementById('eye-icon');
             if (pwd.type === 'password') {
                 pwd.type = 'text';
-                icon.textContent = '🙈';
+                icon.src = 'images/closed_eyes.png';
+                icon.alt = 'Hide password';
             } else {
                 pwd.type = 'password';
-                icon.textContent = '👁️';
+                icon.src = 'images/open_eyes.png';
+                icon.alt = 'Show password';
             }
         });
     </script>
