@@ -611,9 +611,17 @@ function displayPlaceDetails(place) {
         <h1>${place.title}</h1>
         
         <div class="place-meta">
-            <p><strong>🏠 Host:</strong> ${place.owner?.first_name || 'Unknown'} ${place.owner?.last_name || ''}</p>
-            <p><strong>💰 Price:</strong> $${place.price} per night</p>
-            <p><strong>📍 Location:</strong> GPS ${place.latitude?.toFixed(4) || '?'}°, ${place.longitude?.toFixed(4) || '?'}°</p>
+            <p><strong>
+                <img src="images/house.png" alt="Host" style="height:1em;vertical-align:middle;margin-right:0.3em;">
+            </strong>
+            ${place.owner?.first_name || 'Unknown'} ${place.owner?.last_name || ''}</p>
+            <p><strong>
+                <img src="images/price.png" alt="Price" style="height:1em;vertical-align:middle;margin-right:0.3em;">
+            </strong>
+            $${place.price} per night</p>
+            <p><strong>
+                <img src="images/location.png" alt="Location" style="height:1em;vertical-align:middle;margin-right:0.3em;">
+            </strong> GPS ${place.latitude?.toFixed(4) || '?'}°, ${place.longitude?.toFixed(4) || '?'}°</p>
         </div>
         
         <div class="place-description">
