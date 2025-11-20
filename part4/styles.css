@@ -57,11 +57,11 @@ main::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('images/logo.png'), url('images/logo.png');
+    background-image: url('images/logo.png'), url('images/logo_right.png');
     background-repeat: no-repeat, no-repeat;
     background-position: left center, right center;
     background-attachment: fixed, fixed;
-    background-size: 25% auto, 25% auto;
+    background-size: 27% auto, 27% auto;
     opacity: 0.5;
     z-index: -1;
     pointer-events: none;
