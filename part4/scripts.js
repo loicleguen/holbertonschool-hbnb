@@ -30,7 +30,7 @@ function setCookie(name, value, hours = 1) {
     expires.setTime(expires.getTime() + hours * 60 * 60 * 1000); // Convertir heures en millisecondes
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
     
-    console.log(`🍪 Cookie "${name}" set for ${hours} hour(s)`);
+    console.log(`Cookie "${name}" set for ${hours} hour(s)`);
 }
 
 /**
