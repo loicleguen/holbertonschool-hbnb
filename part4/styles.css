@@ -205,6 +205,9 @@ footer {
 }
 
 #filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     max-width: 900px;
     margin: 0 auto 2rem;
     padding: 1rem;
