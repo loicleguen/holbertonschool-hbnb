@@ -651,9 +651,14 @@ function displayAmenities(amenities) {
         return '<p class="no-amenities">No amenities listed.</p>';
     }
     
-    const amenitiesList = amenities.map(amenity => 
-        `<span class="amenity-tag">✨ ${amenity.name}</span>`
-    ).join('');
+    const amenitiesList = amenities.map(amenity => {
+        const slug = amenity.name.toLowerCase().replace(/\s+/g, '_');
+        const iconPath = `images/${slug}.png`;
+        return `<span class="amenity-tag">
+            <img src="${iconPath}" alt="${amenity.name}" style="height:1.2em;vertical-align:middle;margin-right:0.3em;">
+            ${amenity.name}
+        </span>`;
+    }).join('');
     
     return `<div class="amenities-container">${amenitiesList}</div>`;
 }
