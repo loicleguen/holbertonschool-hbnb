@@ -24,7 +24,7 @@ body::before {
     background-repeat: no-repeat, no-repeat;
     background-position: 20px 230px, right 200px;
     background-attachment: fixed, fixed;
-    background-size: 370px auto, 400px auto;
+    background-size: 22vw auto, 24vw auto;
     opacity: 0.5;
 }
 body {
