@@ -655,7 +655,7 @@ function displayAmenities(amenities) {
         const slug = amenity.name.toLowerCase().replace(/\s+/g, '_');
         const iconPath = `images/${slug}.png`;
         return `<span class="amenity-tag">
-            <img src="${iconPath}" alt="${amenity.name}" style="height:1.2em;vertical-align:middle;margin-right:0.3em;">
+            <img src="${iconPath}" alt="${amenity.name}" style="height:1.2em;vertical-align:middle;margin-right:0.3em;" onerror="this.style.display='none'">
             ${amenity.name}
         </span>`;
     }).join('');
