@@ -36,6 +36,50 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
 3. **Relational Schema Design:** Designed the complete relational schema, including **one-to-many** and **many-to-many** relationships, and visualized the structure using a **Mermaid.js** Entity-Relationship Diagram.
 4. **Data Security:** Integrated **Bcrypt** for secure password hashing within the User model.
 
+## 🌐 HBnB - Simple Web Client
+
+In this final phase, the focus shifts to front-end development using **HTML5**, **CSS3**, and **JavaScript ES6**. The goal is to deliver an interactive and user-friendly web interface that communicates seamlessly with the backend API.
+
+### Objectives
+
+- Design and implement a responsive UI based on provided specifications.
+- Enable client-side interaction with the backend API using AJAX/Fetch.
+- Securely manage user authentication and session via JWT tokens stored in cookies.
+- Apply modern web practices for a dynamic, single-page experience.
+
+### Key Features
+
+1. **Design & Structure**  
+   - Completed HTML and CSS files to match design specs.
+   - Pages: Login, List of Places, Place Details, Add Review.
+   - Semantic HTML5 structure and responsive CSS.
+
+2. **Login Functionality**  
+   - AJAX login form authenticates via the API.
+   - JWT token stored in cookies for session management.
+   - Redirects and error handling for user feedback.
+
+3. **Places Listing & Filtering**  
+   - Main page fetches and displays all places as cards.
+   - Client-side filtering by price and country.
+   - Login link visibility adapts to authentication state.
+
+4. **Place Details & Reviews**  
+   - Detailed view for each place, including amenities and reviews.
+   - Add review form accessible only to authenticated users.
+
+5. **Add Review**  
+   - Authenticated users can submit reviews via AJAX.
+   - Success/error messages and redirection handled client-side.
+
+### Technical Highlights
+
+- **Fetch API** for all client-server communication.
+- **Cookie-based JWT** session management.
+- **DOM manipulation** for dynamic content updates.
+- **Client-side form validation** and error handling.
+- **CORS** configured on the backend to allow secure cross-origin requests.
+
 ## Authors
 <div align="center">
   
