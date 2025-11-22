@@ -7,7 +7,7 @@ This repository contains the HBnB project, developed in four progressive parts, 
 
   - [HBnB - UML](#-hbnb---uml)
   - [HBnB - BL and API](#-hbnb---bl-and-api)
-  - [HBnB - Auth & DB](#-hbnb---auth-&-db)
+  - [HBnB - Auth and DB](#-hbnb---auth-and-db)
   - [HBnB - Simple Web Client](#-hbnb---simple-web-client)
   - [Authors](#-authors)
 
@@ -30,7 +30,7 @@ This repository contains the HBnB project, developed in four progressive parts, 
     * [**Amenities**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/amenities.py)
 3.  **Environment Setup:** Finalized project configuration [`config.py`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/config.py) and dependency management [`requirements.txt`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/requirements.txt).
 
-## 🔐 [HBnB - Auth & DB](#-hbnb---auth-&-db)
+## 🔐 [HBnB - Auth and DB](#-hbnb---auth-and-db)
 In this phase, the backend transitioned to a secure, persistent, and scalable architecture:
 1. **JWT Authentication & Authorization:** Implemented user authentication using **Flask-JWT-Extended** and secured endpoints with **role-based access control** (RBAC), allowing only administrators to perform critical actions.
 2. **SQLAlchemy ORM Integration:** Replaced the in-memory repository with a **SQLAlchemy-based persistence layer**, mapping all entities (`User`, `Place`, `Review`, `Amenity`) to a database (SQLite for development).
