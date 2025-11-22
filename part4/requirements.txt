@@ -1,0 +1,8 @@
+flask : serveur web
+flask-restx : API REST
+email_validator : validation email
+unittest : tests unitaires
+json : gestion JSON
+flask-bcrypt : hashage des mots de passe
+flask-jwt-extended : authentification JWT
+flask-cors : gestion CORS pour le front-end

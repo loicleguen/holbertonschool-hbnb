@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="images/icon.png" />
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_left">
+                <a href="index.html"><img src="images/logo.png" alt="HBnB logo" class="logo" width="150" height="auto"></a>
+            </div>
+            <div class="nav_right">
+                <a href="index.html">Home</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <form id="login-form">
+            <h2>Login</h2>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <div style="position: relative;">
+                    <input type="password" id="password" name="password" required style="padding-right: 3.2em; width: 100%;">
+                    <button type="button" id="toggle-password" aria-label="Show password"
+                        style="
+                            position: absolute;
+                            right: 0.2em;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0;
+                            height: 2.5em;
+                            width: 2.5em;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                        <img id="eye-icon" src="images/open_eyes.png" alt="Show password" style="height: 2.2em;">
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="login-button">Login</button>
+        </form>
+    </main>
+    <footer>© 2025 HBnB. All rights reserved.</footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const pwd = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.src = 'images/closed_eyes.png';
+                icon.alt = 'Hide password';
+            } else {
+                pwd.type = 'password';
+                icon.src = 'images/open_eyes.png';
+                icon.alt = 'Show password';
+            }
+        });
+    </script>
+</body>
+</html>
