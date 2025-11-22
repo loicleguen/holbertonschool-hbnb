@@ -245,7 +245,10 @@ function startExpirationTimer() {
     }, timeUntilExpiration);
 }
 ```
-
+<div align="center">
+  <img src="images/expired_in_5_min.png" alt="Session will expire in 5 minutes" width="400">
+  <img src="images/expired.png" alt="Session expired" width="400">
+</div>
 
 ---
 
