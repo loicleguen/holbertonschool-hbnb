@@ -189,7 +189,7 @@ async function submitReview(token, placeId, reviewText) {
 
 ## Snippet Video
 
-https://youtu.be/fYF85jYeWRg
+[**Video link**](https://youtu.be/fYF85jYeWRg)
 
 ---
 
