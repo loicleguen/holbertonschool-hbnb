@@ -19,6 +19,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 - [Technical Requirements](#technical-requirements)
 - [Snippets](#snippets)
 - [Test Video](#test-video)
+- [Running the Project](#renning-the-project)
 - [Resources](#resources)
 - [Author](#author)
 
@@ -263,14 +264,13 @@ Here’s a short video showing how to use HBNB.
 
 ## 🚀 Running the Project
 
-### Setup
-#### Clone the repository:
+### Clone the repository:
 
 ```bash
 git clone https://github.com/loicleguen/holbertonschool-hbnb/tree/main
 ```
 
-#### Install dependencies:
+### Install dependencies:
 
 ##### Assuming you are in the 'hbnb/part4' directory
 ```bash
