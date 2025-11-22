@@ -67,7 +67,6 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
 
 <a name="authors"></a>
 ## 👥 Authors
-<div align="center">
   
 | Author | Role | GitHub | Email |
 |--------|------|--------|-------|
