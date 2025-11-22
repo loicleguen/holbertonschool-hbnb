@@ -17,7 +17,8 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 - [Place Details](#place-details)
 - [Add Review Form](#add-review-form)
 - [Technical Requirements](#technical-requirements)
-- [Snippet Video](#snippet-video)
+- [Snippets](#snippets)
+- [Test Video](#test-video)
 - [Resources](#resources)
 - [Author](#author)
 
@@ -185,9 +186,23 @@ async function submitReview(token, placeId, reviewText) {
 - CORS must be enabled on the backend for API access.
 - Client-side form validation and error handling.
 - All pages must pass W3C validation.
+
 ---
 
-## Snippet Video
+## Snippets
+
+Here is a snippet that sets an expiration for the token and the cookie.
+```
+function setTokenExpiration(hours = 1) {
+    const expirationTime = new Date().getTime() + (hours * 60 * 60 * 1000);
+    localStorage.setItem('tokenExpiration', expirationTime);
+    console.log(`⏰ Token will expire in ${hours} hour(s)`);
+}
+```
+
+---
+
+## Test Video
 
 Here’s a short video showing how to use HBNB.
 [**Video link**](https://youtu.be/fYF85jYeWRg)
