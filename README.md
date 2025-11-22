@@ -62,7 +62,7 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
    - Redirect unauthenticated users to index
    - Display success/error messages
 
-## 👥 Authors(#-authors)
+## 👥 [Authors](#-authors)
 <div align="center">
   
 | Author | Role | GitHub | Email |
