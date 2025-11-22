@@ -261,6 +261,24 @@ Here’s a short video showing how to use HBNB.
 
 ---
 
+## 🚀 Running the Project
+
+### Setup
+#### Clone the repository:
+
+```bash
+git clone https://github.com/loicleguen/holbertonschool-hbnb/tree/main
+cd holbertonschool-hbnb/tree/main/part3/hbnb/part3
+cd holbertonschool-hbnb/tree/main/part4
+```
+
+#### Install dependencies:
+
+##### Assuming you are in the 'hbnb/part3' directory
+```bash
+pip install -r hbnb/requirements.txt
+````
+
 ## Resources
 
 - [HTML5 Documentation](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)
