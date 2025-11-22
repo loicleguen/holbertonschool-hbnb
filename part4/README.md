@@ -1,13 +1,7 @@
-<table width="100%">
-  <tr>
-    <td align="left" width="50%">
-      <img src="images/logo.png" style="width:15vw; opacity:0.8;">
-    </td>
-    <td align="right" width="50%">
-      <img src="images/logo_right.png" style="width:17vw; opacity:0.8;">
-    </td>
-  </tr>
-</table>
+<div style="display: flex; justify-content: space-between; align-items: flex-start;">
+  <img src="images/logo.png" style="width:15vw; opacity:0.8;">
+  <img src="images/logo_right.png" style="width:17vw; opacity:0.8;">
+</div>
 
 # 🖥️ HBnB - Simple Web Client
 
