@@ -255,6 +255,7 @@ function startExpirationTimer() {
 
 ---
 
+<a name="test-video"></a>
 ## <img src="images/youtube.png" width="30"> Test Video
 
 Here’s a short video showing how to use HBNB.
@@ -262,6 +263,7 @@ Here’s a short video showing how to use HBNB.
 
 ---
 
+<a name="running-the-project"></a>
 ## 🚀 Running the Project
 
 ### Clone the repository:
@@ -300,6 +302,7 @@ python3 -m http.server 8000
 
 ---
 
+<a name="author"></a>
 ## 👥 Author
 
 | Author           | Role      | GitHub                                   | Email                        |
