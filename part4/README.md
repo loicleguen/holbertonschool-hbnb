@@ -255,7 +255,7 @@ function startExpirationTimer() {
 
 ---
 
-## <img src="images/youtube.png">Test Video
+## <img src="images/youtube.png" width="30"> Test Video
 
 Here’s a short video showing how to use HBNB.
 [**Video link**](https://youtu.be/fYF85jYeWRg)
