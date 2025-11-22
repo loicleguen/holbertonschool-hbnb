@@ -1,4 +1,17 @@
-<div align="left"><img src="images/logo.png"></div><div align="right"><img src="images/logo_right.png"></div>
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url('images/logo.png'), url('images/logo_right.png');
+    background-repeat: no-repeat, no-repeat;
+    background-position: 20px 230px, right 200px;
+    background-attachment: fixed, fixed;
+    background-size: 22vw auto, 24vw auto;
+    opacity: 0.5;
+}
+<div align="left" body::before><img src="images/logo.png"></div><div align="right" body::before><img src="images/logo_right.png"></div>
 ## 🖥️ HBnB - Simple Web Client
 
 The fourth and final phase introduces a functional front-end built with
