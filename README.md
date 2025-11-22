@@ -5,11 +5,11 @@ This repository contains the HBnB project, developed in four progressive parts, 
 
 ## 📑 Table of Contents :
 
-  - [HBnB - UML](#hbnb---uml)
-  - [HBnB - BL and API](#hbnb---bl-and-api)
-  - [HBnB - Auth & DB](#hbnb---auth-&-db)
-  - [HBnB - Simple Web Client](#hbnb---simple-web-client)
-  - [Authors](#authors)
+  - [HBnB - UML](#-hbnb---uml)
+  - [HBnB - BL and API](#-hbnb---bl-and-api)
+  - [HBnB - Auth & DB](#-hbnb---auth-&-db)
+  - [HBnB - Simple Web Client](#-hbnb---simple-web-client)
+  - [Authors](#-authors)
 
 
 ## 📦 [HBnB - UML](#-hbnb---uml)
