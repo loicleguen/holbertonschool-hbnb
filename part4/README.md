@@ -1,5 +1,5 @@
-
-<div align="left"><img src="images/logo.png"></div>## 🖥️ HBnB - Simple Web Client<div align="right"><img src="images/logo_right.png"></div>
+<div align="left"><img src="images/logo.png"></div><div align="right"><img src="images/logo_right.png"></div>
+## 🖥️ HBnB - Simple Web Client
 
 The fourth and final phase introduces a functional front-end built with
 **HTML5, CSS3, and JavaScript ES6**, consuming the backend API.
