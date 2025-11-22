@@ -278,5 +278,3 @@ Here’s a short video showing how to use HBNB.
 | Author           | Role      | GitHub                                   | Email                        |
 |------------------|-----------|------------------------------------------|------------------------------|
 | **Loïc Le Guen** | Developer | [@loicleguen](https://github.com/loicleguen) | 11510@holbertonstudents.com  |
-
-
