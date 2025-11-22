@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/logo.png" style="width:22vw; opacity:0.5; display:inline-block;">
+  <img src="images/logo.png" style="width:22vw; opacity:0.5; display:inline-block; margin-top:20px;">
   <img src="images/logo_right.png" style="width:24vw; opacity:0.5; display:inline-block;">
 </div>
 ## 🖥️ HBnB - Simple Web Client
