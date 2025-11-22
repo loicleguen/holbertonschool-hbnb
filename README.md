@@ -37,7 +37,7 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
 4. **Data Security:** Integrated **Bcrypt** for secure password hashing within the User model.
 
 
-## 🖥️ [Simple Web Client](#-simple-web-client)
+## 🖥️ [HBnB - Simple Web Client](#-hbnb---simple-web-client)
 1. **Design**
    - Pages: login.html, index.html, place.html, add_review.html
    - Responsive, semantic HTML5
