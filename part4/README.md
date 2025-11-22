@@ -86,7 +86,7 @@ async function loginUser(email, password) {
 
 ------------------------------------------------------------------------
 
-### 3. Index -- List of Places
+### 3. Index List of Places
 
 #### Example Code
 
