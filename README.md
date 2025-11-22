@@ -5,20 +5,20 @@ This repository contains the HBnB project, developed in four progressive parts, 
 
 ## 📑 Table of Contents :
 
-  - [HBnB - UML](#-hbnb---uml)
-  - [HBnB - BL and API](#-hbnb---bl-and-api)
-  - [HBnB - Auth and DB](#-hbnb---auth-and-db)
-  - [HBnB - Simple Web Client](#hbnb---simple-web-client)
-  - [Authors](#-authors)
+- [HBnB - UML](#hbnb---uml)
+- [HBnB - BL and API](#hbnb---bl-and-api)
+- [HBnB - Auth and DB](#hbnb---auth-and-db)
+- [HBnB - Simple Web Client](#hbnb---simple-web-client)
+- [Authors](#authors)
 
 
-## 📦 [HBnB - UML](#-hbnb---uml)
+## 📦 HBnB - UML
 - [0. High-Level Package Diagram.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/0.%20High-Level%20Package%20Diagram.md): a 3-layer architecture (UML Package Diagram) showing layers and the Facade Pattern.
 - [1. Detailed Class Diagram for Business Logic Layer.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/1.%20Detailed%20Class%20Diagram%20for%20Business%20Logic%20Layer.md): a detailed UML Class Diagram for the Business Logic layer entities (User, Place, Review, Amenity)
 - [2. Sequence Diagrams for API Calls.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/2.%20Sequence%20Diagrams%20for%20API%20Calls.md): four UML Sequence Diagrams to map the flow of information for key API calls across the three layers
 - [3. Documentation Compilation.md](https://github.com/loicleguen/holbertonschool-hbnb/blob/develop/part1/3.%20Documentation%20Compilation.md): a compilation of all diagrams and notes into a single, comprehensive Technical Document.
 
-## 🛠 [HBnB - BL and API](#-hbnb---bl-and-api)
+## 🛠 HBnB - BL and API
 1.  **Layered Architecture:** Implemented a clean separation of concerns:
     * **Persistence Layer ([`app/persistence`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence)):** Abstracted data storage logic via a generic [`repository`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/persistence/repository.py).
     * **Service Layer ([`app/services`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/services)):** Established a [`facade`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/services/facade.py) for centralized business logic.
@@ -30,7 +30,7 @@ This repository contains the HBnB project, developed in four progressive parts, 
     * [**Amenities**](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/app/api/v1/amenities.py)
 3.  **Environment Setup:** Finalized project configuration [`config.py`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/config.py) and dependency management [`requirements.txt`](https://github.com/loicleguen/holbertonschool-hbnb/blob/main/part2/hbnb/requirements.txt).
 
-## 🔐 [HBnB - Auth and DB](#-hbnb---auth-and-db)
+## 🔐 HBnB - Auth and DB
 In this phase, the backend transitioned to a secure, persistent, and scalable architecture:
 1. **JWT Authentication & Authorization:** Implemented user authentication using **Flask-JWT-Extended** and secured endpoints with **role-based access control** (RBAC), allowing only administrators to perform critical actions.
 2. **SQLAlchemy ORM Integration:** Replaced the in-memory repository with a **SQLAlchemy-based persistence layer**, mapping all entities (`User`, `Place`, `Review`, `Amenity`) to a database (SQLite for development).
@@ -62,7 +62,7 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
    - Redirect unauthenticated users to index
    - Display success/error messages
 
-## 👥 [Authors](#-authors)
+## 👥 Authors
 <div align="center">
   
 | Author | Role | GitHub | Email |
