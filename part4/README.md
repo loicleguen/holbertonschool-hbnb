@@ -1,10 +1,10 @@
-<table width="300%">
+<table width="100%">
   <tr>
     <td align="left" width="50%">
-      <img src="images/logo.png" style="width:22vw; opacity:0.5;">
+      <img src="images/logo.png" style="width:15vw; opacity:0.8;">
     </td>
     <td align="right" width="50%">
-      <img src="images/logo_right.png" style="width:24vw; opacity:0.5;">
+      <img src="images/logo_right.png" style="width:17vw; opacity:0.8;">
     </td>
   </tr>
 </table>
