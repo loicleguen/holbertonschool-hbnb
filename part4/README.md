@@ -27,7 +27,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 ---
 
 <div align="center">
-  <img src="images/logo_double_bis.png" width="200">
+  <img src="images/logo_double_bis.png" width="400">
 </div>
 
 ## [Project Overview](#table-of-contents)
@@ -76,7 +76,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 ---
 
 <div align="center">
-  <img src="images/logo_double_bis.png" width="200">
+  <img src="images/logo_double_bis.png" width="400">
 </div>
 
 ## [Login (JWT Authentication)](#table-of-contents)
