@@ -26,16 +26,9 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 
 ---
 
-<table width="100%">
-  <tr>
-    <td align="left" width="50%">
-      <img src="images/logo.png" width="200">
-    </td>
-    <td align="right" width="50%">
-      <img src="images/logo_right.png" width="200">
-    </td>
-  </tr>
-</table>
+<div align="center">
+  <img src="images/logo_double_bis.png" width="200">
+</div>
 
 ## [Project Overview](#table-of-contents)
 
@@ -52,6 +45,10 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 - Use client-side scripting to enhance user experience without page reloads.
 
 ---
+
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
 
 ## [Design & Pages](#table-of-contents)
 
@@ -78,16 +75,9 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 
 ---
 
-<table width="100%">
-  <tr>
-    <td align="left" width="50%">
-      <img src="images/logo.png" width="200">
-    </td>
-    <td align="right" width="50%">
-      <img src="images/logo_right.png" width="200">
-    </td>
-  </tr>
-</table>
+<div align="center">
+  <img src="images/logo_double_bis.png" width="200">
+</div>
 
 ## [Login (JWT Authentication)](#table-of-contents)
 
@@ -124,6 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ---
 
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
+
 ## [Index: List of Places](#table-of-contents)
 
 - Displays a list of all places as cards.
@@ -150,6 +144,10 @@ async function fetchPlaces(token) {
 
 ---
 
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
+
 ## [Place Details](#table-of-contents)
 
 - Displays detailed information about a place, including host, price, description, amenities, and reviews.
@@ -173,6 +171,10 @@ async function fetchPlaceDetails(token, placeId) {
 ```
 
 ---
+
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
 
 ## [Add Review Form](#table-of-contents)
 
@@ -201,6 +203,10 @@ async function submitReview(token, placeId, reviewText) {
 
 ---
 
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
+
 ## [Technical Requirements](#table-of-contents)
 
 - Use semantic HTML5 elements for structure.
@@ -212,6 +218,10 @@ async function submitReview(token, placeId, reviewText) {
 - All pages must pass W3C validation.
 
 ---
+
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
 
 ## [Snippets](#table-of-contents)
 
@@ -278,6 +288,10 @@ function startExpirationTimer() {
 
 ---
 
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
+
 <a name="test-video"></a>
 ## <img src="images/youtube.png" width="30"> [Test Video](#table-of-contents)
 
@@ -285,6 +299,10 @@ Here’s a short video showing how to use HBNB.
 [**Video link**](https://youtu.be/fYF85jYeWRg)
 
 ---
+
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
 
 <a name="running-the-project"></a>
 ## [Running the Project](#table-of-contents)
@@ -313,6 +331,10 @@ cd holbertonschool-hbnb/tree/main/part4
 python3 -m http.server 8000
 ```
 
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
+
 ## [Resources](#table-of-contents)
 
 - [HTML5 Documentation](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)
@@ -324,6 +346,10 @@ python3 -m http.server 8000
 - [Client-Side Form Validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
 
 ---
+
+<div align="center">
+  <img src="images/logo_double_bis.png" width="400">
+</div>
 
 <a name="author"></a>
 ## [Author](#table-of-contents)
