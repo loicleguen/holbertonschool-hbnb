@@ -1,5 +1,5 @@
-<div style="display: flex; justify-content: space-between; align-items: flex-start;">
-  <img src="images/double_logo.png" style="width:15vw; opacity:0.8;">
+<div align= 'center'>
+  <img src="images/double_logo.png" style="width:30vw; opacity:0.8;">
 </div>
 
 # 🖥️ HBnB - Simple Web Client
