@@ -19,7 +19,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 - [Technical Requirements](#technical-requirements)
 - [Snippets](#snippets)
 - [Test Video](#test-video)
-- [Running the Project](#renning-the-project)
+- [Running the Project](#running-the-project)
 - [Resources](#resources)
 - [Author](#author)
 
