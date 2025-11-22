@@ -192,7 +192,6 @@ async function submitReview(token, placeId, reviewText) {
 ## Snippets
 
 Here is a snippet that sets an expiration for the token and the cookie.
-Upon expiration, they are automatically deleted, and an auto-logout is triggered.
 ```
 function setCookie(name, value, hours = 1) {
     const expires = new Date();
@@ -205,9 +204,12 @@ function setTokenExpiration(hours = 1) {
     const expirationTime = new Date().getTime() + (hours * 60 * 60 * 1000);
     localStorage.setItem('tokenExpiration', expirationTime);
     console.log(`⏰ Token will expire in ${hours} hour(s)`);
+    setCookie('token', data.access_token, 1); // 1 hour
+    setTokenExpiration(1); // 1 hour
 }
 ```
 Upon expiration, they are automatically deleted, and an auto-logout is triggered.
+There is also a warning message five minutes before the logout.
 ```
 /**
  * Start a timer to auto-logout when token expires
@@ -243,6 +245,7 @@ function startExpirationTimer() {
     }, timeUntilExpiration);
 }
 ```
+
 
 ---
 
