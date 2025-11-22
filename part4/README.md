@@ -1,4 +1,5 @@
 
+<div align="center"><img src="images/logo.png"></div>
 ------------------------------------------------------------------
 
 ## 🖥️ HBnB - Simple Web Client
