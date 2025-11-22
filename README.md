@@ -9,6 +9,7 @@ This repository contains the HBnB project, developed in four progressive parts, 
   - [HBnB - BL and API](#-hbnb---bl-and-api)
   - [HBnB - Auth & DB](#-hbnb---auth-&-db)
   - [HBnB - Simple Web Client](#-hbnb---simple-web-client)
+  - [Authors](#-authors)
 
 
 ## 📦 [HBnB - UML](#-hbnb---uml)
@@ -61,7 +62,7 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
    - Redirect unauthenticated users to index
    - Display success/error messages
 
-## Authors
+## 👥 Authors(#-authors)
 <div align="center">
   
 | Author | Role | GitHub | Email |
