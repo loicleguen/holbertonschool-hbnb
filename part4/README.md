@@ -1,4 +1,4 @@
-<table width="100%">
+<table width="300%">
   <tr>
     <td align="left" width="50%">
       <img src="images/logo.png" style="width:22vw; opacity:0.5;">
