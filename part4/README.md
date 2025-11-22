@@ -22,7 +22,7 @@ The fourth and final phase introduces a functional front-end built with
 [🖥️ HBnB - Simple Web Client](#-hbnb---simple-web-client)
 - [1. Design (HTML & CSS)](#1-design-html--css)
 - [2. Login (JWT Authentication](#2-login-jwt-authentication)
-- [3. Index -- List of Places](#3-index--list-of-places)
+- [3. Index List of Places](#3-index-list-of-places)
 - [4. Place Details](#4-place-details)
 - [5. Add Review Form](#5-add-review-form)
 - [👥 Authors](#-authors)
