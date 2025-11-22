@@ -189,6 +189,7 @@ async function submitReview(token, placeId, reviewText) {
 
 ## Snippet Video
 
+Here’s a short video showing how to use HBNB.
 [**Video link**](https://youtu.be/fYF85jYeWRg)
 
 ---
