@@ -263,7 +263,6 @@ Here’s a short video showing how to use HBNB.
 
 ---
 
-<a name="running-the-project"></a>
 ## 🚀 Running the Project
 
 ### Clone the repository:
