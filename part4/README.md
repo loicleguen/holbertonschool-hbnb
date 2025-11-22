@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="images/logo.png" style="width:12vw; opacity:0.5; display:inline-block; margin-top:20px;">
+  <img src="images/logo_right.png" style="width:14vw; opacity:0.5; display:inline-block;">
+</div>
 <div align= 'center'>
   <img src="images/double_logo.png" style="width:50vw;">
 </div>
