@@ -17,6 +17,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 - [Place Details](#place-details)
 - [Add Review Form](#add-review-form)
 - [Technical Requirements](#technical-requirements)
+- [Snippet Video](#snippet-video)
 - [Resources](#resources)
 - [Author](#author)
 
@@ -184,6 +185,11 @@ async function submitReview(token, placeId, reviewText) {
 - CORS must be enabled on the backend for API access.
 - Client-side form validation and error handling.
 - All pages must pass W3C validation.
+---
+
+## Snippet Video
+
+https://youtu.be/fYF85jYeWRg
 
 ---
 
@@ -204,3 +210,5 @@ async function submitReview(token, placeId, reviewText) {
 | Author           | Role      | GitHub                                   | Email                        |
 |------------------|-----------|------------------------------------------|------------------------------|
 | **Loïc Le Guen** | Developer | [@loicleguen](https://github.com/loicleguen) | 11510@holbertonstudents.com  |
+
+
