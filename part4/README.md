@@ -8,6 +8,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 
 ---
 
+<a name="table-of-contents"></a>
 ## 📚 Table of Contents
 
 - [Project Overview](#project-overview)
@@ -26,6 +27,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 ---
 
 ## Project Overview
+[⬆ Back to Table of Contents](#table-of-contents)
 
 **Objectives:**
 - Develop a user-friendly interface following provided design specifications.
@@ -42,6 +44,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 ---
 
 ## Design & Pages
+[⬆ Back to Table of Contents](#table-of-contents)
 
 **Pages to implement:**
 - `login.html` – Login form for user authentication.
@@ -67,6 +70,7 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 ---
 
 ## Login (JWT Authentication)
+[⬆ Back to Table of Contents](#table-of-contents)
 
 - Implements login functionality using the backend API.
 - Stores the JWT token returned by the API in a cookie for session management.
@@ -102,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ---
 
 ## Index: List of Places
+[⬆ Back to Table of Contents](#table-of-contents)
 
 - Displays a list of all places as cards.
 - Fetches places data from the API and implements client-side filtering by price.
@@ -128,6 +133,7 @@ async function fetchPlaces(token) {
 ---
 
 ## Place Details
+[⬆ Back to Table of Contents](#table-of-contents)
 
 - Displays detailed information about a place, including host, price, description, amenities, and reviews.
 - Fetches place details from the API using the place ID from the URL.
@@ -152,6 +158,7 @@ async function fetchPlaceDetails(token, placeId) {
 ---
 
 ## Add Review Form
+[⬆ Back to Table of Contents](#table-of-contents)
 
 - Only authenticated users can submit reviews.
 - Unauthenticated users are redirected to the index page.
@@ -179,6 +186,7 @@ async function submitReview(token, placeId, reviewText) {
 ---
 
 ## Technical Requirements
+[⬆ Back to Table of Contents](#table-of-contents)
 
 - Use semantic HTML5 elements for structure.
 - Responsive design with CSS3.
@@ -191,6 +199,7 @@ async function submitReview(token, placeId, reviewText) {
 ---
 
 ## Snippets
+[⬆ Back to Table of Contents](#table-of-contents)
 
 Here is a snippet that sets an expiration for the token and the cookie.
 ```
@@ -257,6 +266,7 @@ function startExpirationTimer() {
 
 <a name="test-video"></a>
 ## <img src="images/youtube.png" width="30"> Test Video
+[⬆ Back to Table of Contents](#table-of-contents)
 
 Here’s a short video showing how to use HBNB.
 [**Video link**](https://youtu.be/fYF85jYeWRg)
@@ -265,6 +275,7 @@ Here’s a short video showing how to use HBNB.
 
 <a name="running-the-project"></a>
 ## 🚀 Running the Project
+[⬆ Back to Table of Contents](#table-of-contents)
 
 ### Clone the repository:
 
@@ -291,6 +302,7 @@ python3 -m http.server 8000
 ```
 
 ## Resources
+[⬆ Back to Table of Contents](#table-of-contents)
 
 - [HTML5 Documentation](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)
 - [CSS3 Documentation](https://developer.mozilla.org/en-US/docs/Web/CSS)
@@ -304,6 +316,7 @@ python3 -m http.server 8000
 
 <a name="author"></a>
 ## 👥 Author
+[⬆ Back to Table of Contents](#table-of-contents)
 
 | Author           | Role      | GitHub                                   | Email                        |
 |------------------|-----------|------------------------------------------|------------------------------|
