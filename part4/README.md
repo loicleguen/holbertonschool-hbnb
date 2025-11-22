@@ -309,3 +309,7 @@ python3 -m http.server 8000
 | Author           | Role      | GitHub                                   | Email                        |
 |------------------|-----------|------------------------------------------|------------------------------|
 | **Loïc Le Guen** | Developer | [@loicleguen](https://github.com/loicleguen) | 11510@holbertonstudents.com  |
+
+<div align="center">
+  <img src="images/logo_double.png" style="width:30vw;">
+</div>
