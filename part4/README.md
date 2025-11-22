@@ -1,5 +1,5 @@
 <div align= 'center'>
-  <img src="images/double_logo.png" style="width:30vw; opacity:0.8;">
+  <img src="images/double_logo.png" style="width:50vw;">
 </div>
 
 # 🖥️ HBnB - Simple Web Client
