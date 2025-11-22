@@ -26,12 +26,16 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 
 ---
 
-<div align="left" style="width:49%; display:inline-block;">
-  <img src="images/logo.png" width="200">
-</div>
-<div align="right" style="width:49%; display:inline-block;">
-  <img src="images/logo_right.png" width="200">
-</div>
+<table width="100%">
+  <tr>
+    <td align="left" width="50%">
+      <img src="images/logo.png" width="200">
+    </td>
+    <td align="right" width="50%">
+      <img src="images/logo_right.png" width="200">
+    </td>
+  </tr>
+</table>
 
 ## [Project Overview](#table-of-contents)
 
@@ -74,12 +78,16 @@ This fourth and final phase focuses on building a dynamic front-end for HBnB usi
 
 ---
 
-<div align="left" style="width:49%; display:inline-block;">
-  <img src="images/logo.png" width="200">
-</div>
-<div align="right" style="width:49%; display:inline-block;">
-  <img src="images/logo_right.png" width="200">
-</div>
+<table width="100%">
+  <tr>
+    <td align="left" width="50%">
+      <img src="images/logo.png" width="200">
+    </td>
+    <td align="right" width="50%">
+      <img src="images/logo_right.png" width="200">
+    </td>
+  </tr>
+</table>
 
 ## [Login (JWT Authentication)](#table-of-contents)
 
