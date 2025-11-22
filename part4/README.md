@@ -1,5 +1,5 @@
 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-  <img src="images/logo.png" style="width:22vw; opacity:0.5;">
+  <img src="images/logo.png" style="width:22vw; opacity:0.5; margin-top:20px;">
   <img src="images/logo_right.png" style="width:24vw; opacity:0.5;">
 </div>
 
