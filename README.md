@@ -72,4 +72,3 @@ In this phase, the backend transitioned to a secure, persistent, and scalable ar
 |--------|------|--------|-------|
 | **Loïc Le Guen** | Co-Developer | [@loicleguen](https://github.com/loicleguen) | 11510@holbertonstudents.com |
 | **Valentin TIQUET** | Co-Developer | [@vtiquet](https://github.com/vtiquet) | 11503@holbertonstudents.com |
-</div>
