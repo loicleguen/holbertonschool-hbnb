@@ -25,7 +25,7 @@ The fourth and final phase introduces a functional front-end built with
 - [3. Index List of Places](#3-index-list-of-places)
 - [4. Place Details](#4-place-details)
 - [5. Add Review Form](#5-add-review-form)
-- [👥 Authors](#-authors)
+- [👥 Author](#-author)
 
 ------------------------------------------------------------------------
 
@@ -141,3 +141,10 @@ async function submitReview(token, placeId, reviewText) {
   }
 }
 ```
+
+------------------------------------------------------------------------
+### 👥 Author
+  
+| Author | Role | GitHub | Email |
+|--------|------|--------|-------|
+| **Loïc Le Guen** | Co-Developer | [@loicleguen](https://github.com/loicleguen) | 11510@holbertonstudents.com |
