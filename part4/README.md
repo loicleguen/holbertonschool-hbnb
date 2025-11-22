@@ -208,6 +208,7 @@ function setTokenExpiration(hours = 1) {
 }
 ```
 Upon expiration, they are automatically deleted, and an auto-logout is triggered.
+```
 /**
  * Start a timer to auto-logout when token expires
  */
@@ -241,6 +242,7 @@ function startExpirationTimer() {
         window.location.href = 'login.html';
     }, timeUntilExpiration);
 }
+```
 
 ---
 
