@@ -192,13 +192,55 @@ async function submitReview(token, placeId, reviewText) {
 ## Snippets
 
 Here is a snippet that sets an expiration for the token and the cookie.
+Upon expiration, they are automatically deleted, and an auto-logout is triggered.
 ```
+function setCookie(name, value, hours = 1) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + hours * 60 * 60 * 1000); // Convertir heures en millisecondes
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+    
+    console.log(`Cookie "${name}" set for ${hours} hour(s)`);
+}
 function setTokenExpiration(hours = 1) {
     const expirationTime = new Date().getTime() + (hours * 60 * 60 * 1000);
     localStorage.setItem('tokenExpiration', expirationTime);
     console.log(`⏰ Token will expire in ${hours} hour(s)`);
 }
 ```
+Upon expiration, they are automatically deleted, and an auto-logout is triggered.
+/**
+ * Start a timer to auto-logout when token expires
+ */
+function startExpirationTimer() {
+    const expirationTime = localStorage.getItem('tokenExpiration');
+    
+    if (!expirationTime) return;
+    
+    const now = new Date().getTime();
+    const timeUntilExpiration = parseInt(expirationTime) - now;
+    
+    if (timeUntilExpiration <= 0) {
+        checkTokenExpiration();
+        return;
+    }
+    
+    const warningTime = timeUntilExpiration - (5 * 60 * 1000);
+    
+    if (warningTime > 0) {
+        setTimeout(() => {
+            if (getCookie('token')) {
+                alert('⚠️ Your session will expire in 5 minutes. Please save your work.');
+            }
+        }, warningTime);
+    }
+    
+    setTimeout(() => {
+        deleteCookie('token');
+        localStorage.removeItem('tokenExpiration');
+        alert('Your session has expired. Please login again.');
+        window.location.href = 'login.html';
+    }, timeUntilExpiration);
+}
 
 ---
 
